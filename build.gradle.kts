@@ -1,40 +1,23 @@
 // build.gradle.kts
 
-val kotlinVersion = "2.0.21"
-val logbackVersion = "1.5.6"
-
 plugins {
     kotlin("jvm") version "2.0.21"
-    id("io.ktor.plugin") version "2.3.12"
     kotlin("plugin.serialization") version "2.0.21"
 }
 
 group = "ai.solace.core.kognitive"
 version = "0.0.1"
 
-application {
-    mainClass.set("ai.solace.core.KognitiveKt")
-
-    val isDevelopment: Boolean = project.hasProperty("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
-}
 
 repositories {
     mavenCentral()
+    maven("https://repo.kotlin.link")
 }
 
 dependencies {
-    // Ktor core dependencies
-    // Note remove -jvm for other platforms
-    implementation("io.ktor:ktor-server-core-jvm:2.3.12")
-    implementation("io.ktor:ktor-server-netty-jvm:2.3.12")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:2.3.12")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.9.0")
+    runtimeOnly("space.kscience:kmath-core:0.3.1")
 
-    implementation("io.ktor:ktor-client-core:2.3.11")
-    implementation("io.ktor:ktor-client-cio:2.3.11")
-    implementation("io.ktor:ktor-client-auth:2.3.11")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.11")
-    implementation("io.ktor:ktor-serialization-gson:2.3.12")
 
     // Scripting engine
     implementation("org.jetbrains.kotlin:kotlin-scripting-jsr223:2.0.0")
@@ -68,7 +51,7 @@ dependencies {
 
     // Testing
     testImplementation("io.ktor:ktor-server-tests-jvm:2.3.12")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.0.21")
 }
 
 kotlin {
