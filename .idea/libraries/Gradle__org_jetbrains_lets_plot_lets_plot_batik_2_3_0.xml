@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.lets-plot:lets-plot-batik:2.3.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.lets-plot" artifactId="lets-plot-batik" version="2.3.0" baseVersion="2.3.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.lets-plot/lets-plot-batik/2.3.0/7569604f508d66440f59c31faefaaf640a11ff46/lets-plot-batik-2.3.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.lets-plot/lets-plot-batik/2.3.0/e84486c9fa59e829cdcf50f4a607915520e58052/lets-plot-batik-2.3.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

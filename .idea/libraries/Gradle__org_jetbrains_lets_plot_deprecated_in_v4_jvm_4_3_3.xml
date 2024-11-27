@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.lets-plot:deprecated-in-v4-jvm:4.3.3" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.lets-plot" artifactId="deprecated-in-v4-jvm" version="4.3.3" baseVersion="4.3.3" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.lets-plot/deprecated-in-v4-jvm/4.3.3/f7c1edd0d59b46ad0b4576b352eeb56f7a694e90/deprecated-in-v4-jvm-4.3.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.lets-plot/deprecated-in-v4-jvm/4.3.3/5649b40fc628f0590fb58a12f57365c198563ebb/deprecated-in-v4-jvm-4.3.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

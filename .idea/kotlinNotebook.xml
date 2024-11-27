@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="KotlinNotebookOptionsProvider">
-    <option name="shouldBuildProject" value="true" />
+    <option name="heapMaxLimitInMib" value="16384" />
+    <option name="jvmTargetForSnippets" value="21" />
   </component>
 </project>

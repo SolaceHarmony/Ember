@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.kotlinx:kotlin-deeplearning-dataset-jvm:0.5.2" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.kotlinx" artifactId="kotlin-deeplearning-dataset-jvm" version="0.5.2" baseVersion="0.5.2" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlin-deeplearning-dataset-jvm/0.5.2/4b3cb7d5e21adf6da21ee30b52816306a132d990/dataset-jvm-0.5.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlin-deeplearning-dataset-jvm/0.5.2/c69da9340cac583e09fea984c63e1a7a32a8d154/kotlin-deeplearning-dataset-jvm-0.5.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.kotlinx:kotlin-deeplearning-visualization-jvm:0.5.1" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.kotlinx" artifactId="kotlin-deeplearning-visualization-jvm" version="0.5.1" baseVersion="0.5.1" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlin-deeplearning-visualization-jvm/0.5.1/5956b7ba73fe1346cb37866e3746e4d93c5f56/visualization-jvm-0.5.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlin-deeplearning-visualization-jvm/0.5.1/ae0ee481811a94c9aa151144f9d9befe7162dea6/kotlin-deeplearning-visualization-jvm-0.5.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

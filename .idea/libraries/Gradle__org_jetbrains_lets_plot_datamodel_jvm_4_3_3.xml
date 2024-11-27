@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.lets-plot:datamodel-jvm:4.3.3" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.lets-plot" artifactId="datamodel-jvm" version="4.3.3" baseVersion="4.3.3" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.lets-plot/datamodel-jvm/4.3.3/2b926f8b63a61f5e305dd1e87f8280c6e3cdefc6/datamodel-jvm-4.3.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.lets-plot/datamodel-jvm/4.3.3/9e4cb6da2aa103bbcbc6954ea5e3458a1bd1978e/datamodel-jvm-4.3.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

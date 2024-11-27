@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.kotlinx:kotlin-deeplearning-api:0.5.2" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.kotlinx" artifactId="kotlin-deeplearning-api" version="0.5.2" baseVersion="0.5.2" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlin-deeplearning-api/0.5.2/b400652f13886d8a48db9a561623add5eb075dfd/kotlin-deeplearning-api-0.5.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlin-deeplearning-api/0.5.2/6d731c7cea2387fd7f1ad3a9786b7fa2d1053ac3/kotlin-deeplearning-api-0.5.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

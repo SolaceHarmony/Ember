@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.lets-plot:platf-awt-jvm:4.3.3" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.lets-plot" artifactId="platf-awt-jvm" version="4.3.3" baseVersion="4.3.3" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.lets-plot/platf-awt-jvm/4.3.3/7942e2d74f3c237df13a8effc143da55c68bd258/platf-awt-jvm-4.3.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.lets-plot/platf-awt-jvm/4.3.3/b225cb3abb9072aba2d6c16930c78d99a5de20f7/platf-awt-jvm-4.3.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

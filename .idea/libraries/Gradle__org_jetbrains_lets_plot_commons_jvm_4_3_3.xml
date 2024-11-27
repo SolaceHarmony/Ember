@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.lets-plot:commons-jvm:4.3.3" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.lets-plot" artifactId="commons-jvm" version="4.3.3" baseVersion="4.3.3" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.lets-plot/commons-jvm/4.3.3/33c8489df0074d9bee74ef68730b8ae82a45eb5f/commons-jvm-4.3.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.lets-plot/commons-jvm/4.3.3/da173bb9d4a8dc6a435856ed1c7b82ce57e0f0ba/commons-jvm-4.3.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

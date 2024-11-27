@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.kotlinx:kotlin-deeplearning-onnx-jvm:0.5.1" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.kotlinx" artifactId="kotlin-deeplearning-onnx-jvm" version="0.5.1" baseVersion="0.5.1" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlin-deeplearning-onnx-jvm/0.5.1/a67af00ab9049013667467c781e1e0ac91d999d7/onnx-jvm-0.5.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlin-deeplearning-onnx-jvm/0.5.1/1aa42e6bc0009d1f9072f7ecad941c3af41249e1/kotlin-deeplearning-onnx-jvm-0.5.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

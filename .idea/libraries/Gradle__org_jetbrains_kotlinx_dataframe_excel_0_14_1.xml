@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.kotlinx:dataframe-excel:0.14.1" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.kotlinx" artifactId="dataframe-excel" version="0.14.1" baseVersion="0.14.1" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/dataframe-excel/0.14.1/66fcef76ad44d41e4deba46344f4d386d599d764/dataframe-excel-0.14.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/dataframe-excel/0.14.1/6372ed071b4ee526e46c91c87559c4be230757b0/dataframe-excel-0.14.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

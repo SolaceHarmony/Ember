@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.microsoft.onnxruntime:onnxruntime:1.12.1" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.microsoft.onnxruntime" artifactId="onnxruntime" version="1.12.1" baseVersion="1.12.1" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.microsoft.onnxruntime/onnxruntime/1.12.1/20f9f5bdd10a2dd7d34a1d504b43d1c83ba8f028/onnxruntime-1.12.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.microsoft.onnxruntime/onnxruntime/1.12.1/697be78f491296ecfe90193f89454f05897ddb11/onnxruntime-1.12.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow:0.5.2" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.kotlinx" artifactId="kotlin-deeplearning-tensorflow" version="0.5.2" baseVersion="0.5.2" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlin-deeplearning-tensorflow/0.5.2/ee37833e28de01e238bcd551fbdd1b53dbf56e9d/kotlin-deeplearning-tensorflow-0.5.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlin-deeplearning-tensorflow/0.5.2/abe68a10020a7636e1d293a7649340aa743814df/kotlin-deeplearning-tensorflow-0.5.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

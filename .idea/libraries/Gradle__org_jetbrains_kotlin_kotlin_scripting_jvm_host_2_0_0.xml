@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.kotlin:kotlin-scripting-jvm-host:2.0.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.kotlin" artifactId="kotlin-scripting-jvm-host" version="2.0.0" baseVersion="2.0.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-jvm-host/2.0.0/f2d2da7a38032128af4a5208e9aef96ac1e8aa2/kotlin-scripting-jvm-host-2.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-jvm-host/2.0.0/fa65be1da0a2ced39f765af705f25e1c07b7a1cb/kotlin-scripting-jvm-host-2.0.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

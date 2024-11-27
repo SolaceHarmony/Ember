@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.tensorflow:libtensorflow_jni:1.15.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.tensorflow" artifactId="libtensorflow_jni" version="1.15.0" baseVersion="1.15.0" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../.gradle/caches/modules-2/files-2.1/org.tensorflow/libtensorflow_jni/1.15.0/e749c7ce289ad236914657a11b3c198f35ae5f41/libtensorflow_jni-1.15.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
