@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: io.jhdf:jhdf:0.5.7" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="io.jhdf" artifactId="jhdf" version="0.5.7" baseVersion="0.5.7" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.jhdf/jhdf/0.5.7/473cdbc05333cafbb30727e2cc676a77c320221c/jhdf-0.5.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.jhdf/jhdf/0.5.7/9b052401407a3581c1ac5d833c068f75e07d3fb1/jhdf-0.5.7-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

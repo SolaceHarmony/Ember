@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: io.swagger:swagger-parser-safe-url-resolver:1.0.70" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="io.swagger" artifactId="swagger-parser-safe-url-resolver" version="1.0.70" baseVersion="1.0.70" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger/swagger-parser-safe-url-resolver/1.0.70/a72b6548d83b890de3c5810036c6510c56fb09ae/swagger-parser-safe-url-resolver-1.0.70.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger/swagger-parser-safe-url-resolver/1.0.70/2d44c455c4bb331425f350d427711dbe97407fc5/swagger-parser-safe-url-resolver-1.0.70-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

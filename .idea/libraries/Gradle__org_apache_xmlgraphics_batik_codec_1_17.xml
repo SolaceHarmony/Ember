@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.xmlgraphics:batik-codec:1.17" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.apache.xmlgraphics" artifactId="batik-codec" version="1.17" baseVersion="1.17" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.xmlgraphics/batik-codec/1.17/7cceac705d050a9730e7032da43a42c66cfadc41/batik-codec-1.17.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.xmlgraphics/batik-codec/1.17/2e3a226cb1d29f9efcf7619ce6ea126d0fba0feb/batik-codec-1.17-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.xmlgraphics:xmlgraphics-commons:2.6" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.apache.xmlgraphics" artifactId="xmlgraphics-commons" version="2.6" baseVersion="2.6" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../.gradle/caches/modules-2/files-2.1/org.apache.xmlgraphics/xmlgraphics-commons/2.6/8779b8d8f426f24fdb4a512f8bc4248cb3775bd2/xmlgraphics-commons-2.6.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.bio:npy:0.3.5" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.bio" artifactId="npy" version="0.3.5" baseVersion="0.3.5" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.bio/npy/0.3.5/d6c84e30c331136b1814978276b099086d56de34/npy-0.3.5.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.bio/npy/0.3.5/e731e4c3c635b031c422d81101d7c955791965f6/npy-0.3.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

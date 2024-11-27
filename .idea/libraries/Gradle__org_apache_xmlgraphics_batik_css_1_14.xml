@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.xmlgraphics:batik-css:1.14" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.apache.xmlgraphics" artifactId="batik-css" version="1.14" baseVersion="1.14" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../.gradle/caches/modules-2/files-2.1/org.apache.xmlgraphics/batik-css/1.14/3118d46f4879ec08c6c6471c7c0825652ed659ee/batik-css-1.14.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

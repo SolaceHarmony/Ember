@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.kotlinx:dataframe-jdbc:0.14.1" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.kotlinx" artifactId="dataframe-jdbc" version="0.14.1" baseVersion="0.14.1" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/dataframe-jdbc/0.14.1/76b2e3562d27966edce0963ae335f023d0c71fe9/dataframe-jdbc-0.14.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/dataframe-jdbc/0.14.1/2630a0081b83fcbb15f0deb8a5eaf85a861328c4/dataframe-jdbc-0.14.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

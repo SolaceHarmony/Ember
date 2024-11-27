@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.xmlgraphics:batik-i18n:1.17" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.apache.xmlgraphics" artifactId="batik-i18n" version="1.17" baseVersion="1.17" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.xmlgraphics/batik-i18n/1.17/39b233a71430ffa9d0282d47789a58fa8bf4f861/batik-i18n-1.17.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.xmlgraphics/batik-i18n/1.17/b25b770ee03c7f82525ddd61791214466c797bdd/batik-i18n-1.17-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

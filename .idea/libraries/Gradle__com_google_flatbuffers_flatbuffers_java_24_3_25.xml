@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.flatbuffers:flatbuffers-java:24.3.25" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.google.flatbuffers" artifactId="flatbuffers-java" version="24.3.25" baseVersion="24.3.25" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.flatbuffers/flatbuffers-java/24.3.25/edc46436b645a12126322d02608dd21aba5ac433/flatbuffers-java-24.3.25.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.flatbuffers/flatbuffers-java/24.3.25/f2c9d5ae52867bb9614e93ee9d112582ddbe2ee7/flatbuffers-java-24.3.25-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: io.ktor:ktor-server-forwarded-header-jvm:2.3.12" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="io.ktor" artifactId="ktor-server-forwarded-header-jvm" version="2.3.12" baseVersion="2.3.12" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../.gradle/caches/modules-2/files-2.1/io.ktor/ktor-server-forwarded-header-jvm/2.3.12/6f8f0008c47ec20fa10cfd20fbd2df7aa71355fb/ktor-server-forwarded-header-jvm-2.3.12.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

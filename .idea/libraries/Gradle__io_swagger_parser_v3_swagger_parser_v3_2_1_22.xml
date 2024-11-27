@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: io.swagger.parser.v3:swagger-parser-v3:2.1.22" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="io.swagger.parser.v3" artifactId="swagger-parser-v3" version="2.1.22" baseVersion="2.1.22" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger.parser.v3/swagger-parser-v3/2.1.22/58160f204b0be1921443020b4e9c074d3e5009c3/swagger-parser-v3-2.1.22.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger.parser.v3/swagger-parser-v3/2.1.22/ebe016137bec0892ba920cdc641fecd77fa704b8/swagger-parser-v3-2.1.22-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

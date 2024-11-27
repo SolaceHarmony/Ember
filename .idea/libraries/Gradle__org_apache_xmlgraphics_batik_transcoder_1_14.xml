@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.xmlgraphics:batik-transcoder:1.14" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.apache.xmlgraphics" artifactId="batik-transcoder" version="1.14" baseVersion="1.14" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../.gradle/caches/modules-2/files-2.1/org.apache.xmlgraphics/batik-transcoder/1.14/ad3a750a02e53cf9b66d67371f0ddf889f06c070/batik-transcoder-1.14.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

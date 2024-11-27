@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.kotlinx:multik-openblas-jvm:0.2.3" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.kotlinx" artifactId="multik-openblas-jvm" version="0.2.3" baseVersion="0.2.3" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/multik-openblas-jvm/0.2.3/d431f401d3fa3cbc58c1f5769c71413b20bfbb7e/multik-openblas-jvm-0.2.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/multik-openblas-jvm/0.2.3/c0c62afa577ad477f994c8f4b064156cd20b2b2/multik-openblas-jvm-0.2.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

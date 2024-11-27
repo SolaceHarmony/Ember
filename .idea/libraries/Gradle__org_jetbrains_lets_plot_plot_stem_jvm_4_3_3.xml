@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.lets-plot:plot-stem-jvm:4.3.3" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.lets-plot" artifactId="plot-stem-jvm" version="4.3.3" baseVersion="4.3.3" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.lets-plot/plot-stem-jvm/4.3.3/5c2272b4355b9b50aece4fc9736f9371746e64a7/plot-stem-jvm-4.3.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.lets-plot/plot-stem-jvm/4.3.3/935072f76d1d9b645480e9a0b94a38706d97c443/plot-stem-jvm-4.3.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

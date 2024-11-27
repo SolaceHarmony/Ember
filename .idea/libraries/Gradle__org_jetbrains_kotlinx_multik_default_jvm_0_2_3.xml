@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.kotlinx:multik-default-jvm:0.2.3" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.jetbrains.kotlinx" artifactId="multik-default-jvm" version="0.2.3" baseVersion="0.2.3" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/multik-default-jvm/0.2.3/767e0932c58dcd2bfa3f0d2535df9a3053a52046/multik-default-jvm-0.2.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/multik-default-jvm/0.2.3/b2b3a2eb3c21b020d0393d8df6f51db59365d2da/multik-default-jvm-0.2.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalDependencies">
+    <plugin id="NodeJS" />
+    <plugin id="com.intellij.gradle" />
+    <plugin id="intellij.jupyter" />
+    <plugin id="intellij.ktor" />
+    <plugin id="org.jetbrains.kotlin" min-version="2.0.20" />
+    <plugin id="org.jetbrains.plugins.kotlin.jupyter" />
+    <plugin id="org.jetbrains.plugins.node-remote-interpreter" />
+    <plugin id="org.jetbrains.plugins.wsl.remoteSdk" />
+  </component>
+</project>

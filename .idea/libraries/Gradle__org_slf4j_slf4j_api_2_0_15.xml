@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.slf4j:slf4j-api:2.0.15" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.slf4j" artifactId="slf4j-api" version="2.0.15" baseVersion="2.0.15" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/2.0.15/35ed0d9a6b7c011bb8656087f79e371263b3b485/slf4j-api-2.0.15.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
