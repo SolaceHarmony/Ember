@@ -2,9 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Kognitive.iml" filepath="$PROJECT_DIR$/.idea/modules/Kognitive.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Kognitive.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Kognitive.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Kognitive.test.iml" filepath="$PROJECT_DIR$/.idea/modules/Kognitive.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kotlinJvm_proofs.iml" filepath="$PROJECT_DIR$/.idea/modules/kotlinJvm_proofs.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kotlinJvm_proofs.main.iml" filepath="$PROJECT_DIR$/.idea/modules/kotlinJvm_proofs.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kotlinJvm_proofs.test.iml" filepath="$PROJECT_DIR$/.idea/modules/kotlinJvm_proofs.test.iml" />

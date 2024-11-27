@@ -4,9 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6a7f91f3-bb91-4233-ba06-0420c77b4cab" name="Changes" comment="Two more files.">
-      <change afterPath="$PROJECT_DIR$/shared/src/commonMain/kotlin/ai/solace/core/kognitive/compute/fastmm/AlphaTensorMM.kt" afterDir="false" />
+    <list default="true" id="6a7f91f3-bb91-4233-ba06-0420c77b4cab" name="Changes" comment="Checkpoint - bug fixes on shaping of tensors">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Permanent_Script_Dependencies.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/Kognitive.main.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/Kognitive.test.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
+    <list id="406c7f12-5a87-4633-990b-cb87a3439f46" name="dontcheckin" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__ch_qos_logback_logback_classic_1_5_11.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__ch_qos_logback_logback_core_1_5_11.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_beust_klaxon_5_5.xml" beforeDir="false" />
@@ -307,11 +313,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__xalan_xalan_2_7_2.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__xml_apis_xml_apis_1_4_01.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__xml_apis_xml_apis_ext_1_3_04.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/shared/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/commonMain/kotlin/ai/solace/core/kognitive/model/matrix/LiquidTimeConstant.kt" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/commonMain/kotlin/ai/solace/core/kognitive/model/matrix/LiquidTimeConstant.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/commonMain/kotlin/ai/solace/core/kognitive/model/matrix/MultiHeadAttention.kt" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/commonMain/kotlin/ai/solace/core/kognitive/model/matrix/MultiHeadAttention.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/commonMain/kotlin/ai/solace/core/kognitive/model/matrix/TransformerLNN.kt" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/commonMain/kotlin/ai/solace/core/kognitive/model/matrix/TransformerLNN.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -349,47 +350,6 @@
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="Kognitive" type="f1a62948:ProjectNode" />
               </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="Kognitive" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="Kognitive" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-                <item name="build" type="c8890929:TasksNode$1" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="Kognitive" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-                <item name="run" type="c8890929:TasksNode$1" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="Kognitive" type="f1a62948:ProjectNode" />
-                <item name="shared" type="2d1252cf:ModuleNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="Kognitive" type="f1a62948:ProjectNode" />
-                <item name="shared" type="2d1252cf:ModuleNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="Kognitive" type="f1a62948:ProjectNode" />
-                <item name="shared" type="2d1252cf:ModuleNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-                <item name="build" type="c8890929:TasksNode$1" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="Kognitive" type="f1a62948:ProjectNode" />
-                <item name="shared" type="2d1252cf:ModuleNode" />
-                <item name="Run Configurations" type="7b0102dc:RunConfigurationsNode" />
-              </path>
             </expand>
             <select />
           </tree_state>
@@ -405,6 +365,7 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="PUSH_AUTO_UPDATE" value="true" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GithubDefaultAccount">
@@ -415,6 +376,9 @@
   &quot;isMigrated&quot;: true
 }</component>
   <component name="PhpWorkspaceProjectConfiguration" interpreter_name="PHP" />
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 0
@@ -424,41 +388,41 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Gradle.Build Kognitive.executor": "Run",
-    "Gradle.Kognitive [buildEnvironment].executor": "Run",
-    "Gradle.Kognitive [cleanNativeDistributionCommonization].executor": "Run",
-    "Gradle.Kognitive [commonize].executor": "Run",
-    "Gradle.Kognitive [init].executor": "Run",
-    "Gradle.Kognitive [linkMacosArm64].executor": "Run",
-    "Gradle.Kognitive [macosArm64Binaries].executor": "Run",
-    "Gradle.Kognitive [macosArm64MainBinaries].executor": "Run",
-    "Gradle.Kognitive [resolveIdeDependencies].executor": "Run",
-    "Gradle.Kognitive [runDebugExecutableMacosArm64].executor": "Run",
-    "Gradle.Kognitive [runReleaseExecutableMacosArm64].executor": "Run",
-    "Gradle.Kognitive:shared [buildDependents].executor": "Run",
-    "Gradle.Kognitive:shared [build].executor": "Run",
-    "Gradle.Kognitive:shared [clean].executor": "Run",
-    "Gradle.Kognitive:shared [linkMacosArm64].executor": "Run",
-    "Gradle.Kognitive:shared [linkReleaseFrameworkMacosArm64].executor": "Run",
-    "Gradle.Kognitive:shared [macosArm64MainBinaries].executor": "Run",
-    "Gradle.Kognitive:shared [macosArm64MainKlibrary].executor": "Run",
-    "Kotlin.Unnamed.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.0",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Gradle.Build Kognitive.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Kognitive [buildEnvironment].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Kognitive [cleanNativeDistributionCommonization].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Kognitive [commonize].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Kognitive [init].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Kognitive [linkMacosArm64].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Kognitive [macosArm64Binaries].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Kognitive [macosArm64MainBinaries].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Kognitive [resolveIdeDependencies].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Kognitive [runDebugExecutableMacosArm64].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Kognitive [runReleaseExecutableMacosArm64].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Kognitive:shared [buildDependents].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Kognitive:shared [build].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Kognitive:shared [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Kognitive:shared [linkMacosArm64].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Kognitive:shared [linkReleaseFrameworkMacosArm64].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Kognitive:shared [macosArm64MainBinaries].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Kognitive:shared [macosArm64MainKlibrary].executor&quot;: &quot;Run&quot;,
+    &quot;Kotlin.Unnamed.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/shared/src/commonMain/kotlin" />
@@ -596,6 +560,7 @@
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="6a7f91f3-bb91-4233-ba06-0420c77b4cab" name="Changes" comment="" />
+      <changelist id="406c7f12-5a87-4633-990b-cb87a3439f46" name="dontcheckin" comment="" />
       <created>1732693339952</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -603,7 +568,8 @@
       <workItem from="1732693341435" duration="1080000" />
       <workItem from="1732694425724" duration="40000" />
       <workItem from="1732694470154" duration="2900000" />
-      <workItem from="1732713541659" duration="12465000" />
+      <workItem from="1732713541659" duration="12834000" />
+      <workItem from="1732749847087" duration="429000" />
     </task>
     <task id="LOCAL-00001" summary="First compilable (but still buggy) with MacOS binary.">
       <option name="closed" value="true" />
@@ -621,7 +587,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732724547075</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Checkpoint - bug fixes on shaping of tensors">
+      <option name="closed" value="true" />
+      <created>1732749699129</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1732749699129</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -641,6 +615,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="First compilable (but still buggy) with MacOS binary." />
     <MESSAGE value="Two more files." />
-    <option name="LAST_COMMIT_MESSAGE" value="Two more files." />
+    <MESSAGE value="Checkpoint - bug fixes on shaping of tensors" />
+    <option name="LAST_COMMIT_MESSAGE" value="Checkpoint - bug fixes on shaping of tensors" />
   </component>
 </project>
