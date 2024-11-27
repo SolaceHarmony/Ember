@@ -29,11 +29,6 @@ daemon/.DS_Store
 /.idea/runConfigurations
 /daemon
 /jdks
-/kotlinJvm_proofs
-/kotlinJvm_proofs
-/kotlinJvm_proofs
-kotlinJvm_proofs/build.gradle.kts
-/kotlinJvm_proofs
 /gradle/wrapper
 /build
 gradlew
@@ -53,4 +48,4 @@ python_proofs/.DS_Store
 /python_proofs/__pycache__
 /wrapper/dists
 .DS_Store
-.DS_Store
+.idea/libraries/*

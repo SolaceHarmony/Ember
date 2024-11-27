@@ -35,7 +35,10 @@ kotlin {
         }
     }
 }
-
+tasks.register<Exec>("runNative") {
+    dependsOn("linkDebugExecutableNative")
+    commandLine("./build/bin/native/debugExecutable/native.kexe")
+}
 tasks.named("build") {
     dependsOn("linkDebugFrameworkMacosArm64")
 }

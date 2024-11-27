@@ -7,9 +7,15 @@ class MultiHeadAttention(
     private val hiddenSize: Int,
     private val numHeads: Int
 ) {
+    init {
+        require(hiddenSize % numHeads == 0) {
+            "Hidden size ($hiddenSize) must be divisible by number of heads ($numHeads)"
+        }
+    }
+
     private val headDim = hiddenSize / numHeads
 
-    // Initialize weight matrices
+    // Initialize weight matrices for Q, K, V
     private val wQuery = CPUMatrix.create(hiddenSize, hiddenSize).also { matrix ->
         for (i in 0 until matrix.data.size) {
             matrix.data[i] = kotlin.random.Random.nextFloat() * 0.02f - 0.01f
@@ -43,17 +49,34 @@ class MultiHeadAttention(
         val batchSize = query.rows
         val seqLen = query.cols / hiddenSize
 
-        // Linear projections and split into heads
+        println("\nMultiHeadAttention forward:")
+        println("Input shapes - Q:(${query.rows}, ${query.cols}), K:(${key.rows}, ${key.cols}), V:(${value.rows}, ${value.cols})")
+
+        // Project and reshape for multi-head attention
         val q = projectAndReshape(query, wQuery, batchSize, seqLen)
         val k = projectAndReshape(key, wKey, batchSize, seqLen)
         val v = projectAndReshape(value, wValue, batchSize, seqLen)
 
-        // Scaled dot-product attention
-        val scaledAttention = computeAttention(q, k, v, mask)
+        println("After projection - Q:(${q.rows}, ${q.cols}), K:(${k.rows}, ${k.cols}), V:(${v.rows}, ${v.cols})")
 
-        // Concatenate heads and project back
-        val concatAttention = reshapeConcatHeads(scaledAttention, batchSize, seqLen)
-        return concatAttention.matmul(wOut)
+        // Compute attention scores
+        val scores = computeAttentionScores(q, k, mask, batchSize, seqLen)
+        println("Attention scores shape: (${scores.rows}, ${scores.cols})")
+
+        // Apply attention to values
+        val attended = applyAttentionToValues(scores, v, batchSize, seqLen)
+        println("Attended values shape: (${attended.rows}, ${attended.cols})")
+
+        // Reshape back and project
+        val output = projectOutput(attended, batchSize, seqLen)
+        println("Output shape: (${output.rows}, ${output.cols})")
+
+        // Ensure output matches input dimensions
+        require(output.rows == query.rows && output.cols == query.cols) {
+            "Output dimensions (${output.rows}, ${output.cols}) don't match input dimensions (${query.rows}, ${query.cols})"
+        }
+
+        return output
     }
 
     private suspend fun projectAndReshape(
@@ -62,16 +85,24 @@ class MultiHeadAttention(
         batchSize: Int,
         seqLen: Int
     ): CPUMatrix<Float> {
-        val projected = input.matmul(weights)
+        // First reshape input from (batchSize, seqLen*hiddenSize) to (batchSize*seqLen, hiddenSize)
+        val reshapedInput = reshapeToSequence(input, batchSize, seqLen, hiddenSize)
+        println("Reshaped input shape: (${reshapedInput.rows}, ${reshapedInput.cols})")
+
+        // Project using weights
+        val projected = reshapedInput.matmul(weights)
+        println("Projected shape: (${projected.rows}, ${projected.cols})")
+
+        // Reshape for multi-head attention: (batchSize*numHeads, seqLen, headDim)
         val result = FloatArray(batchSize * numHeads * seqLen * headDim)
 
         for (b in 0 until batchSize) {
             for (h in 0 until numHeads) {
                 for (s in 0 until seqLen) {
                     for (d in 0 until headDim) {
-                        val fromIdx = b * seqLen * hiddenSize + s * hiddenSize + h * headDim + d
-                        val toIdx = b * numHeads * seqLen * headDim + h * seqLen * headDim + s * headDim + d
-                        result[toIdx] = projected.data[fromIdx]
+                        val srcIdx = b * seqLen * hiddenSize + s * hiddenSize + h * headDim + d
+                        val dstIdx = (b * numHeads + h) * seqLen * headDim + s * headDim + d
+                        result[dstIdx] = projected.data[srcIdx]
                     }
                 }
             }
@@ -80,16 +111,25 @@ class MultiHeadAttention(
         return CPUMatrix.fromArray(result, batchSize * numHeads, seqLen * headDim)
     }
 
-    private suspend fun computeAttention(
+    private suspend fun computeAttentionScores(
         query: CPUMatrix<Float>,
         key: CPUMatrix<Float>,
-        value: CPUMatrix<Float>,
-        mask: CPUMatrix<Float>?
+        mask: CPUMatrix<Float>?,
+        batchSize: Int,
+        seqLen: Int
     ): CPUMatrix<Float> {
-        val scores = query.matmul(key.transpose())
+        // Compute QK^T
+        val keyTransposed = key.transpose()
+        println("Key transposed shape: (${keyTransposed.rows}, ${keyTransposed.cols})")
+
+        val scores = query.matmul(keyTransposed)
+        println("Raw scores shape: (${scores.rows}, ${scores.cols})")
+
+        // Scale scores
         val scaleFactor = sqrt(headDim.toFloat())
         val scaledScores = FloatArray(scores.data.size) { scores.data[it] / scaleFactor }
 
+        // Apply mask if provided
         if (mask != null) {
             for (i in scaledScores.indices) {
                 scaledScores[i] = if (mask.data[i] == 0.0f) {
@@ -100,11 +140,36 @@ class MultiHeadAttention(
             }
         }
 
-        val attentionWeights = applySoftmax(
-            CPUMatrix.fromArray(scaledScores, scores.rows, scores.cols)
-        )
+        // Apply softmax
+        return applySoftmax(CPUMatrix.fromArray(scaledScores, scores.rows, scores.cols))
+    }
 
-        return attentionWeights.matmul(value)
+    private suspend fun applyAttentionToValues(
+        scores: CPUMatrix<Float>,
+        values: CPUMatrix<Float>,
+        batchSize: Int,
+        seqLen: Int
+    ): CPUMatrix<Float> {
+        val attended = scores.matmul(values)
+        println("Attended shape before reshape: (${attended.rows}, ${attended.cols})")
+        return attended
+    }
+
+    private suspend fun projectOutput(
+        attended: CPUMatrix<Float>,
+        batchSize: Int,
+        seqLen: Int
+    ): CPUMatrix<Float> {
+        // Reshape from (batchSize*numHeads, seqLen*headDim) to (batchSize*seqLen, hiddenSize)
+        val reshaped = reshapeFromMultiHead(attended, batchSize, seqLen)
+        println("Reshaped attended shape: (${reshaped.rows}, ${reshaped.cols})")
+
+        // Final projection
+        val projected = reshaped.matmul(wOut)
+        println("Projected output shape: (${projected.rows}, ${projected.cols})")
+
+        // Reshape back to (batchSize, seqLen*hiddenSize)
+        return reshapeFromSequence(projected, batchSize, seqLen, hiddenSize)
     }
 
     private suspend fun applySoftmax(input: CPUMatrix<Float>): CPUMatrix<Float> {
@@ -139,8 +204,46 @@ class MultiHeadAttention(
         return CPUMatrix.fromArray(result, input.rows, input.cols)
     }
 
-    private fun reshapeConcatHeads(
-        attention: CPUMatrix<Float>,
+    private fun reshapeToSequence(
+        input: CPUMatrix<Float>,
+        batchSize: Int,
+        seqLen: Int,
+        featureSize: Int
+    ): CPUMatrix<Float> {
+        val result = FloatArray(input.data.size)
+        for (b in 0 until batchSize) {
+            for (s in 0 until seqLen) {
+                for (f in 0 until featureSize) {
+                    val fromIdx = b * seqLen * featureSize + s * featureSize + f
+                    val toIdx = (b * seqLen + s) * featureSize + f
+                    result[toIdx] = input.data[fromIdx]
+                }
+            }
+        }
+        return CPUMatrix.fromArray(result, batchSize * seqLen, featureSize)
+    }
+
+    private fun reshapeFromSequence(
+        input: CPUMatrix<Float>,
+        batchSize: Int,
+        seqLen: Int,
+        featureSize: Int
+    ): CPUMatrix<Float> {
+        val result = FloatArray(input.data.size)
+        for (b in 0 until batchSize) {
+            for (s in 0 until seqLen) {
+                for (f in 0 until featureSize) {
+                    val fromIdx = (b * seqLen + s) * featureSize + f
+                    val toIdx = b * seqLen * featureSize + s * featureSize + f
+                    result[toIdx] = input.data[fromIdx]
+                }
+            }
+        }
+        return CPUMatrix.fromArray(result, batchSize, seqLen * featureSize)
+    }
+
+    private fun reshapeFromMultiHead(
+        input: CPUMatrix<Float>,
         batchSize: Int,
         seqLen: Int
     ): CPUMatrix<Float> {
@@ -150,9 +253,9 @@ class MultiHeadAttention(
             for (h in 0 until numHeads) {
                 for (s in 0 until seqLen) {
                     for (d in 0 until headDim) {
-                        val fromIdx = b * numHeads * seqLen * headDim + h * seqLen * headDim + s * headDim + d
-                        val toIdx = b * seqLen * hiddenSize + s * hiddenSize + h * headDim + d
-                        result[toIdx] = attention.data[fromIdx]
+                        val srcIdx = (b * numHeads + h) * seqLen * headDim + s * headDim + d
+                        val dstIdx = b * seqLen * hiddenSize + s * hiddenSize + h * headDim + d
+                        result[dstIdx] = input.data[srcIdx]
                     }
                 }
             }
