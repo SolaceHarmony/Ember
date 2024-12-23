@@ -1,0 +1,278 @@
+# --- Cell 1 (markdown) ---
+## Step 1: Define the Enhanced LTC Architecture
+
+# --- Cell 2 (code) ---
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torchaudio
+from torchdiffeq import odeint
+
+class ImprovedLiquidTimeConstantCell(nn.Module):
+    def __init__(self, input_size, hidden_size):
+        super(ImprovedLiquidTimeConstantCell, self).__init__()
+        self.input_size = input_size
+        self.hidden_size = hidden_size
+
+        # Define weight matrices
+        self.W = nn.Linear(hidden_size, hidden_size)
+        self.U = nn.Linear(input_size, hidden_size)
+        self.b = nn.Parameter(torch.zeros(hidden_size))
+
+        # Time constants
+        self.tau = nn.Parameter(torch.ones(hidden_size))
+
+    def forward(self, t, x, u):
+        # x: hidden state
+        # u: input at time t
+        nonlinear_term = torch.sqrt(x + 1)  # Equivalent to (x + 1)^0.5
+        dxdt = (-x / self.tau) + torch.tanh(self.W(x) + self.U(u) + self.b)
+        dxdt = dxdt * nonlinear_term  # Incorporate the nonlinear term
+        return dxdt
+
+class ImprovedLiquidNeuralNetwork(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size, parallel_chains):
+        super(ImprovedLiquidNeuralNetwork, self).__init__()
+        self.hidden_size = hidden_size
+        self.parallel_chains = parallel_chains
+        self.ltc_cells = nn.ModuleList([ImprovedLiquidTimeConstantCell(input_size, hidden_size) for _ in range(parallel_chains)])
+        self.output_layer = nn.Linear(hidden_size * parallel_chains, output_size)
+
+    def forward(self, input_sequence, times):
+        # input_sequence: [batch_size, seq_len, input_size]
+        # times: [seq_len]
+        batch_size, seq_len, _ = input_sequence.size()
+        x0 = torch.zeros(batch_size, self.hidden_size * self.parallel_chains).to(input_sequence.device)
+
+        outputs = []
+        for t in range(seq_len - 1):
+            # Define the time interval
+            t_span = torch.tensor([times[t], times[t + 1]]).to(input_sequence.device)
+            # Get input at current time
+            u = input_sequence[:, t, :]
+            # Split x0 into parallel chains
+            x0_split = torch.chunk(x0, self.parallel_chains, dim=1)
+            # Integrate the ODE for each chain
+            x_new = []
+            for chain_idx in range(self.parallel_chains):
+                chain_cell = self.ltc_cells[chain_idx]
+                x_chain = x0_split[chain_idx]
+                x = odeint(chain_cell, x_chain, t_span, method='rk4', options={'step_size':0.1}, args=(u[:, chain_idx],))
+                x_new.append(x[-1])
+            # Concatenate the outputs from all chains
+            x0 = torch.cat(x_new, dim=1)
+            # Generate output
+            y = self.output_layer(x0)
+            outputs.append(y)
+        outputs = torch.stack(outputs, dim=1)
+        return outputs
+
+
+# --- Cell 3 (markdown) ---
+
+
+# --- Cell 4 (code) ---
+class HybridLNNModel(nn.Module):
+    def __init__(self, input_size, hidden_size, lstm_hidden_size, output_size, parallel_chains):
+        super(HybridLNNModel, self).__init__()
+        self.lnn = ImprovedLiquidNeuralNetwork(input_size, hidden_size, lstm_hidden_size, parallel_chains)
+        self.lstm = nn.LSTM(lstm_hidden_size, lstm_hidden_size, batch_first=True)
+        self.output_layer = nn.Linear(lstm_hidden_size, output_size)
+
+    def forward(self, input_sequence, times):
+        # Pass through LNN
+        lnn_output = self.lnn(input_sequence, times)  # [batch, seq_len-1, lstm_hidden_size]
+        # Pass through LSTM
+        lstm_out, _ = self.lstm(lnn_output)
+        # Pass through Output Layer
+        y = self.output_layer(lstm_out)
+        return y
+
+
+# --- Cell 5 (code) ---
+class AttentionLayer(nn.Module):
+    def __init__(self, query_dim, key_dim, value_dim, hidden_dim):
+        super(AttentionLayer, self).__init__()
+        self.query = nn.Linear(query_dim, hidden_dim)
+        self.key = nn.Linear(key_dim, hidden_dim)
+        self.value = nn.Linear(value_dim, hidden_dim)
+        self.scale = hidden_dim ** 0.5
+
+    def forward(self, query, key, value):
+        # query: [batch, query_dim]
+        # key, value: [batch, seq_len, key_dim/value_dim]
+        scores = torch.matmul(self.query(query).unsqueeze(1), self.key(key).transpose(-2, -1)) / self.scale  # [batch, 1, seq_len]
+        attn_weights = torch.softmax(scores, dim=-1)  # [batch, 1, seq_len]
+        out = torch.matmul(attn_weights, self.value(value))  # [batch, 1, hidden_dim]
+        return out.squeeze(1)  # [batch, hidden_dim]
+
+
+# --- Cell 6 (code) ---
+class EnhancedHybridLNNModel(nn.Module):
+    def __init__(self, input_size, hidden_size, lstm_hidden_size, output_size, parallel_chains, attention_hidden_dim):
+        super(EnhancedHybridLNNModel, self).__init__()
+        self.lnn = ImprovedLiquidNeuralNetwork(input_size, hidden_size, lstm_hidden_size, parallel_chains)
+        self.lstm = nn.LSTM(lstm_hidden_size, lstm_hidden_size, batch_first=True)
+        self.attention = AttentionLayer(lstm_hidden_size, lstm_hidden_size, lstm_hidden_size, attention_hidden_dim)
+        self.output_layer = nn.Linear(lstm_hidden_size, output_size)
+
+    def forward(self, input_sequence, times):
+        # Pass through LNN
+        lnn_output = self.lnn(input_sequence, times)  # [batch, seq_len-1, lstm_hidden_size]
+        # Pass through LSTM
+        lstm_out, _ = self.lstm(lnn_output)  # [batch, seq_len-1, lstm_hidden_size]
+        # Apply Attention
+        context = self.attention(lstm_out[:, -1, :], lstm_out, lstm_out)  # [batch, lstm_hidden_size]
+        # Combine context with last LSTM output
+        combined = lstm_out[:, -1, :] + context  # [batch, lstm_hidden_size]
+        # Pass through Output Layer
+        y = self.output_layer(combined)
+        return y
+
+
+# --- Cell 7 (code) ---
+import torch
+from torch.utils.data import Dataset, DataLoader
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from collections import deque
+
+class LogDataset(Dataset):
+    def __init__(self, csv_file, sequence_length=50, transform=None):
+        """
+        Args:
+            csv_file (string): Path to the CSV file with log data.
+            sequence_length (int): Number of time steps in each input sequence.
+            transform (callable, optional): Optional transform to be applied
+                on a sample.
+        """
+        self.data = pd.read_csv(csv_file)
+        self.sequence_length = sequence_length
+        self.transform = transform
+
+        # Assuming the CSV has columns 'feature1', 'feature2', ..., 'featureN', and 'label'
+        feature_columns = [col for col in self.data.columns if col.startswith('feature')]
+        self.features = self.data[feature_columns].values
+        self.labels = self.data['label'].values  # 0 for normal, 1 for anomaly
+
+        # Normalize features
+        self.scaler = StandardScaler()
+        self.features = self.scaler.fit_transform(self.features)
+
+    def __len__(self):
+        # Number of sequences is total data points minus the sequence length
+        return len(self.data) - self.sequence_length
+
+    def __getitem__(self, idx):
+        # Get a sequence of features
+        feature_sequence = self.features[idx:idx + self.sequence_length]
+        label = self.labels[idx + self.sequence_length]  # Label for the next time step
+
+        sample = {'features': torch.tensor(feature_sequence, dtype=torch.float32),
+                  'label': torch.tensor(label, dtype=torch.float32)}
+
+        if self.transform:
+            sample = self.transform(sample)
+
+        return sample
+
+
+# --- Cell 8 (code) ---
+# Parameters
+csv_file = 'preprocessed_logs.csv'  # Path to your preprocessed log data
+batch_size = 32
+sequence_length = 50  # Number of time steps in each input sequence
+shuffle = True
+
+# Initialize the Dataset
+dataset = LogDataset(csv_file=csv_file, sequence_length=sequence_length)
+
+# Initialize the DataLoader
+dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=4)
+
+
+# --- Cell 9 (code) ---
+# Define model parameters
+input_size = 3  # Number of features
+hidden_size = 128
+lstm_hidden_size = 128
+output_size = 1  # Binary classification: normal or anomaly
+parallel_chains = 4
+attention_hidden_dim = 64
+
+# Initialize model, loss function, and optimizer
+device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+model = EnhancedHybridLNNModel(input_size, hidden_size, lstm_hidden_size, output_size, parallel_chains, attention_hidden_dim).to(device)
+criterion = nn.BCEWithLogitsLoss()
+optimizer = optim.Adam(model.parameters(), lr=1e-3)
+
+# Training loop remains similar, adjusted for the new model
+num_epochs = 10
+for epoch in range(num_epochs):
+    for sequences, labels in dataloader:
+        sequences = sequences.to(device)
+        labels = labels.to(device)
+
+        # Define time steps
+        seq_len = sequences.size(1)
+        times = torch.linspace(0, 1, steps=seq_len).to(device)
+
+        # Forward pass
+        outputs = model(sequences, times)  # [batch, output_size]
+        predictions = outputs.squeeze(1)
+
+        # Compute loss
+        loss = criterion(predictions, labels)
+
+        # Backward pass and optimization
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+    print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}")
+
+
+# --- Cell 10 (code) ---
+#!/usr/bin/env python3
+import sys
+import json
+import torch
+
+# Load the traced model
+model = torch.jit.load("enhanced_lnn_anomaly_detector.pt")
+model.eval()
+
+def main():
+    for line in sys.stdin:
+        log_entry = json.loads(line)
+        # Extract and preprocess features
+        features = [
+            log_entry.get('feature1', 0),
+            log_entry.get('feature2', 0),
+            log_entry.get('feature3', 0)
+        ]
+        # Normalize if necessary (ensure consistency with training)
+        # For demonstration, assuming features are already normalized
+
+        # Prepare sequence (last 50 entries)
+        sequence = log_entry.get('sequence', [0]*50)  # Placeholder
+        if len(sequence) < 50:
+            sequence = [0]*(50 - len(sequence)) + sequence
+        sequence = torch.tensor(sequence, dtype=torch.float32).unsqueeze(0)  # [1, 50, 3]
+        times = torch.linspace(0, 1, steps=50).to(sequence.device)
+
+        with torch.no_grad():
+            output = model(sequence, times)
+            prediction = torch.sigmoid(output).item()
+
+        # Add prediction to log entry
+        log_entry['anomaly_score'] = prediction
+        log_entry['is_anomaly'] = 1 if prediction > 0.7 else 0  # Adjust threshold as needed
+
+        # Output the modified log entry
+        print(json.dumps(log_entry))
+
+if __name__ == "__main__":
+    main()
+
+

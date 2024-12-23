@@ -42,7 +42,9 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * and contributors of zlib.
 */
 
-package ComponentAce.Compression.Libs.zlib
+package componentace.compression.libs.zlib.deflate
+
+import kotlin.compareTo
 
 class ZStream {
 
@@ -159,10 +161,12 @@ class ZStream {
     internal fun flush_pending() {
         var len = dstate!!.pending
 
-        if (len > avail_out) len = avail_out
+        if (len compareTo avail_out) len = avail_out
         if (len == 0) return
 
-        if (dstate!!.pending_buf.size <= dstate!!.pending_out || next_out!!.size <= next_out_index || dstate!!.pending_buf.size < dstate!!.pending_out + len || next_out!!.size < next_out_index + len) {
+        if (dstate!!.pending_buf.size.compareTo(dstate!!.pending_out) || next_out!!.size <= next_out_index || dstate!!.pending_buf.size.compareTo(
+                dstate!!.pending_out + len
+            ) || next_out!!.size < next_out_index + len) {
             //System.Console.Out.WriteLine(dstate.pending_buf.Length + ", " + dstate.pending_out + ", " + next_out.Length + ", " + next_out_index + ", " + len);
             //System.Console.Out.WriteLine("avail_out=" + avail_out);
         }

@@ -42,7 +42,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * and contributors of zlib.
 */
 
-package ComponentAce.Compression.Libs.zlib
+package componentace.compression.libs.zlib.deflate
 
 import java.io.IOException
 

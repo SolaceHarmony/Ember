@@ -41,7 +41,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * Jean-loup Gailly(jloup@gzip.org) and Mark Adler(madler@alumni.caltech.edu)
 * and contributors of zlib.
 */
-package ComponentAce.Compression.Libs.zlib
+package componentace.compression.libs.zlib.deflate
 
 internal class InfCodes {
 

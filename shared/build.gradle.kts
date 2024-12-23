@@ -19,8 +19,10 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(kotlin("stdlib"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
                 runtimeOnly("space.kscience:kmath-core:0.3.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-io-core:0.6.0")
             }
         }
         val commonTest by getting {
@@ -30,7 +32,9 @@ kotlin {
         }
         val macosArm64Main by getting {
             dependencies {
+                implementation(kotlin("stdlib"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-macosarm64:1.9.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-io-core-macosarm64:0.6.0")
             }
         }
     }

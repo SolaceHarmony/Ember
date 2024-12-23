@@ -1,0 +1,136 @@
+# --- Cell 1 (code) ---
+import openai
+import os
+
+# Initialize the OpenAI client
+client = openai.OpenAI(api_key="")
+
+# Function to fetch embeddings
+def get_embedding_v3(text, model="text-embedding-3-small"):
+    """
+    Generate embeddings for a given text using the specified v3 embedding model.
+    Returns: Embedding vector
+    """
+    response = client.embeddings.create(
+        input=text,
+        model=model
+    )
+    # Extract the embedding from the response data
+    embedding = response.data[0].embedding
+    return embedding
+
+# Example texts
+texts = [
+    "The quick brown fox jumps over the lazy dog.",
+    "AI is transforming the world of technology.",
+    "Deep learning enables powerful language models."
+]
+
+# Fetch embeddings for the texts
+embeddings = [get_embedding_v3(text, model="text-embedding-3-small") for text in texts]
+
+# Print a snippet of the embeddings for verification
+for i, embedding in enumerate(embeddings):
+    print(f"Embedding {i+1}: {embedding[:10]}... (truncated)")
+
+
+# --- Cell 2 (code) ---
+import numpy as np
+
+def fractal_harmonic_encoding(embeddings, num_harmonics=16):
+    """
+    Encode embeddings using fractal harmonics.
+    """
+    # Ensure embeddings is a NumPy array
+    embeddings = np.array(embeddings)  # Convert to NumPy array if it's not already
+
+    num_samples, embedding_dim = embeddings.shape
+    time = np.linspace(0, 1, embedding_dim)
+
+    fractal_encoded = []
+    for embedding in embeddings:
+        harmonic_sum = 0
+        for i in range(1, num_harmonics + 1):
+            freq = i / num_harmonics
+            harmonic = np.sin(2 * np.pi * freq * time) * embedding
+            harmonic_sum += harmonic
+        fractal_encoded.append(harmonic_sum / num_harmonics)
+
+    return np.array(fractal_encoded)
+
+# Encode embeddings
+encoded_embeddings = fractal_harmonic_encoding(embeddings)
+print("Encoded embeddings shape:", encoded_embeddings.shape)
+
+
+# --- Cell 3 (code) ---
+def fractal_harmonic_decoding(encoded_embeddings, num_harmonics=16):
+    """
+    Decode fractal harmonics back into original embeddings.
+    """
+    decoded_embeddings = []
+    time = np.linspace(0, 1, encoded_embeddings.shape[1])
+    
+    for fractal in encoded_embeddings:
+        components = []
+        for h in range(1, num_harmonics + 1):
+            freq = h / num_harmonics
+            phase = np.pi * (h / num_harmonics)
+            harmonic_wave = np.sin(2 * np.pi * freq * time + phase)
+            components.append(fractal * harmonic_wave)
+        decoded_embeddings.append(np.sum(components, axis=0))
+    return np.array(decoded_embeddings)
+
+# Decode embeddings
+decoded_embeddings = fractal_harmonic_decoding(encoded_embeddings)
+print("Decoded embeddings shape:", decoded_embeddings.shape)
+
+
+# --- Cell 4 (code) ---
+def fractal_harmonic_decoding(encoded_embeddings, num_harmonics=16):
+    """
+    Decode fractal harmonics back into original embeddings.
+    """
+    decoded_embeddings = []
+    time = np.linspace(0, 1, encoded_embeddings.shape[1])
+    
+    for fractal in encoded_embeddings:
+        components = []
+        for h in range(1, num_harmonics + 1):
+            freq = h / num_harmonics
+            phase = np.pi * (h / num_harmonics)
+            harmonic_wave = np.sin(2 * np.pi * freq * time + phase)
+            components.append(fractal * harmonic_wave)
+        decoded_embeddings.append(np.sum(components, axis=0))
+    return np.array(decoded_embeddings)
+
+# Decode embeddings
+decoded_embeddings = fractal_harmonic_decoding(encoded_embeddings)
+print("Decoded embeddings shape:", decoded_embeddings.shape)
+
+
+# --- Cell 5 (code) ---
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Evaluate Reconstruction Loss
+reconstruction_loss = np.mean((embeddings - decoded_embeddings) ** 2)
+print("Reconstruction Loss (MSE):", reconstruction_loss)
+
+# Test Semantic Similarity
+original_similarity = cosine_similarity(embeddings)
+decoded_similarity = cosine_similarity(decoded_embeddings)
+
+# Compare similarity matrices
+print("Original Similarity Matrix:\n", original_similarity)
+print("Decoded Similarity Matrix:\n", decoded_similarity)
+
+
+# --- Cell 6 (code) ---
+response = openai.Embedding.create(
+    input="Your text here",
+    model="text-embedding-3-large",
+    dimensions=512  # Reduce to 512 dimensions
+)
+reduced_embedding = np.array(response["data"][0]["embedding"])
+
+

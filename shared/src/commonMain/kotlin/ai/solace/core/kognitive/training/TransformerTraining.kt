@@ -68,7 +68,7 @@ class TransformerTrainer(
         return totalLoss / validationData.size
     }
 
-    private suspend fun calculateLoss(output: CPUMatrix<Float>, target: CPUMatrix<Float>): Float {
+    private fun calculateLoss(output: CPUMatrix<Float>, target: CPUMatrix<Float>): Float {
         // Mean Squared Error for now
         var loss = 0.0f
         for (i in 0 until output.data.size) {
@@ -101,16 +101,30 @@ class TransformerTrainer(
         val strFormatted = String.format("%.2f", loss )
         val strFormatted2 = String.format("%.2f", validationLoss )
 
-        println("Epoch $epoch, Batch $batch - Loss: ${strFormatted}, Validation: ${strFormatted2}")
+        println("Epoch $epoch, Batch $batch - Loss: ${strFormatted}, Validation: $strFormatted2")
     }
 }
 
-data class TrainingSequence(
-    val input: FloatArray,
-    val target: FloatArray
-) {
+data class TrainingSequence(internal val input: FloatArray, internal val target: FloatArray) {
     fun toInputTensor(): CPUMatrix<Float> = CPUMatrix.fromArray(input, 1, input.size)
     fun toTargetTensor(): CPUMatrix<Float> = CPUMatrix.fromArray(target, 1, target.size)
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as TrainingSequence
+
+        if (!input.contentEquals(other.input)) return false
+        if (!target.contentEquals(other.target)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = input.contentHashCode()
+        result = 31 * result + target.contentHashCode()
+        return result
+    }
 }
 
 interface Optimizer {

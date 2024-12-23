@@ -1,4 +1,3 @@
 package ai.solace.core.kognitive.utils.ports
 
-class IOException {
-}
+class IOException(message: String) : Exception(message)

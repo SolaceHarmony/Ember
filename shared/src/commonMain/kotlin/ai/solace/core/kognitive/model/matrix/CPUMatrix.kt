@@ -4,6 +4,7 @@ package ai.solace.core.kognitive.model.matrix
 
 import kotlinx.coroutines.*
 import kotlin.native.concurrent.*
+import kotlin.math.exp
 
 @ThreadLocal
 object MatrixDispatcher {
@@ -39,7 +40,7 @@ class CPUMatrix<T : Number> private constructor(
 
         fun fromArray(data: FloatArray, rows: Int, cols: Int): CPUMatrix<Float> {
             require(data.size == rows * cols) {
-                "Data size must match dimensions: got ${data.size}, expected ${rows * cols}"
+                "Data size must match dimensions: got \${data.size}, expected \${rows * cols}"
             }
             return CPUMatrix(data, rows, cols, floatOps)
         }
@@ -47,27 +48,27 @@ class CPUMatrix<T : Number> private constructor(
 
     init {
         require(data.size == rows * cols) {
-            "Data size must match dimensions: got ${data.size}, expected ${rows * cols}"
+            "Data size must match dimensions: got \${data.size}, expected \${rows * cols}"
         }
     }
 
     operator fun get(row: Int, col: Int): Float {
         require(row in 0 until rows && col in 0 until cols) {
-            "Index out of bounds: ($row, $col) for matrix of size ($rows, $cols)"
+            "Index out of bounds: (\$row, \$col) for matrix of size (\$rows, \$cols)"
         }
         return data[row * cols + col]
     }
 
     operator fun set(row: Int, col: Int, value: Float) {
         require(row in 0 until rows && col in 0 until cols) {
-            "Index out of bounds: ($row, $col) for matrix of size ($rows, $cols)"
+            "Index out of bounds: (\$row, \$col) for matrix of size (\$rows, \$cols)"
         }
         data[row * cols + col] = value
     }
 
     suspend fun matmul(other: CPUMatrix<T>): CPUMatrix<T> {
         require(cols == other.rows) {
-            "Invalid dimensions for matrix multiplication: ($rows,$cols) x (${other.rows},${other.cols})"
+            "Invalid dimensions for matrix multiplication: (\$rows,\$cols) x (\${other.rows},\${other.cols})"
         }
 
         val result = FloatArray(rows * other.cols) { 0.0f }
@@ -146,5 +147,10 @@ class CPUMatrix<T : Number> private constructor(
             }
         }
         return CPUMatrix(result, cols, rows, numericOps)
+    }
+
+    fun applyElementwise(operation: (Float) -> Float): CPUMatrix<Float> {
+        val newData = data.map { operation(it) }.toFloatArray()
+        return CPUMatrix(newData, rows, cols, floatOps)
     }
 }

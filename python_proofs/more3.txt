@@ -1,0 +1,297 @@
+# --- Cell 1 (code) ---
+import numpy as np
+import matplotlib.pyplot as plt
+from collections import defaultdict
+import math
+from typing import List
+
+# --- Previously Tested Code (Stable Baseline) ---
+# For example, fractal connectivity and LTC neurons, Hebbian, etc.
+
+def generate_fractal_connectivity(num_neurons, levels=3, block_connect_prob=0.7, sparse_prob=0.02):
+    W = np.zeros((num_neurons, num_neurons))
+    def fractal_block(start, end, level):
+        size = end - start
+        if level == 0:
+            block = (np.random.rand(size,size)<block_connect_prob).astype(float)
+            np.fill_diagonal(block,0.0)
+            W[start:end,start:end]=block
+        else:
+            segments=2
+            segment_size=size//segments
+            for i in range(segments):
+                s_start=start+i*segment_size
+                s_end=s_start+segment_size
+                fractal_block(s_start, s_end, level-1)
+    fractal_block(0, num_neurons, levels-1)
+
+    background=(np.random.rand(num_neurons,num_neurons)<sparse_prob).astype(float)
+    np.fill_diagonal(background,0.0)
+    W = np.maximum(W,background)
+    col_sums = W.sum(axis=0)+1e-8
+    W/=col_sums
+    return W
+
+def hebbian_update(W, pre, post, lr=0.001):
+    delta=lr*np.outer(post,pre)
+    W+=delta
+    col_sums=W.sum(axis=0)+1e-8
+    W/=col_sums
+    return W
+
+class LTCNeuron:
+    def __init__(self,tau=1.0):
+        self.state=0.0
+        self.tau=tau
+    def update(self,input_signal,dt=0.1):
+        dstate=(1/self.tau)*(input_signal - self.state)*dt
+        self.state+=dstate
+        return self.state
+    
+class ObservableLTCNeuron(LTCNeuron):
+    def __init__(self, tau=1.0):
+        super().__init__(tau=tau)
+        self.dopamine = 0.5
+        self.serotonin = 1.0
+        self.norepinephrine = 0.3
+        self.state_history = []
+
+    def compute_reward(self):
+        return np.random.choice([0, 1], p=[0.9, 0.1])
+
+    def update(self, input_signal, dt=0.1):
+        dh = (1/self.tau)*(input_signal - self.state)*dt
+        self.state += dh
+
+        # Neuromodulator placeholder updates
+        d_dopamine = (-self.dopamine + self.compute_reward()) / 0.1
+        d_serotonin = (-self.serotonin + 1.0)/1.0
+        d_norepinephrine = (-self.norepinephrine + abs(dh))/0.2
+
+        self.dopamine += d_dopamine*dt
+        self.serotonin += d_serotonin*dt
+        self.norepinephrine += d_norepinephrine*dt
+
+        self.state_history.append({
+            'state': self.state,
+            'dopamine': self.dopamine,
+            'serotonin': self.serotonin,
+            'norepinephrine': self.norepinephrine
+        })
+        return self.state
+# --- Add New Classes without integrating them yet ---
+class MotorNeuronWithCuriosity:
+    def __init__(self, threshold_time=1.0, decay_rate=0.1, focus_strength=1.0, curiosity_weight=0.5):
+        self.threshold_time=threshold_time
+        self.decay_rate=decay_rate
+        self.focus_strength=focus_strength
+        self.curiosity_weight=curiosity_weight
+        self.focus_history=[]
+        self.attention_weights={}
+        self.novelty_scores={}
+
+    def initialize_tokens(self,tokens):
+        for token in tokens:
+            self.attention_weights[token]=self.focus_strength
+            self.novelty_scores[token]=0.0
+
+    def update_focus(self,token_id,focus_time):
+        if focus_time>self.threshold_time:
+            self.attention_weights[token_id]*=(1-self.decay_rate)
+        else:
+            self.attention_weights[token_id]*=(1+self.decay_rate)
+        self.focus_history.append((token_id,focus_time))
+        self._normalize_weights()
+
+    def update_curiosity(self,token_id,prediction_error):
+        self.novelty_scores[token_id]+=prediction_error
+
+    def decide_next_focus(self,candidates,temperature=0.5):
+        engagement_scores=[]
+        for token in candidates:
+            attention_weight=self.attention_weights.get(token,1.0)
+            curiosity_score=self.novelty_scores.get(token,0.0)
+            engagement_score=(1 - attention_weight) + self.curiosity_weight*curiosity_score
+            engagement_scores.append(engagement_score)
+        probabilities=np.exp(np.array(engagement_scores)/temperature)
+        probabilities/=probabilities.sum()
+        return np.random.choice(candidates,p=probabilities)
+
+    def _normalize_weights(self):
+        total_weight=sum(self.attention_weights.values())
+        if total_weight>0:
+            for token_id in self.attention_weights:
+                self.attention_weights[token_id]/=total_weight
+
+class CausalAttention:
+    def __init__(self,decay_rate=0.1,novelty_threshold=0.3,memory_length=100):
+        self.states={}
+        self.history=[]
+        self.decay_rate=decay_rate
+        self.novelty_threshold=novelty_threshold
+        self.memory_length=memory_length
+
+    def update(self,neuron_id,prediction_error,current_state,target_state):
+        temporal_decay = np.exp(-self.decay_rate*len(self.history))
+        causal_weight = 1 - min(abs(prediction_error),1.0)
+        novelty=abs(target_state - current_state)
+        novelty_weight=novelty if novelty>self.novelty_threshold else 0.0
+        attention_value=(temporal_decay+causal_weight+novelty_weight)/3.0
+        self.history.append((neuron_id,attention_value))
+        if len(self.history)>self.memory_length:
+            self.history.pop(0)
+        return attention_value
+
+class HebbianLayer:
+    def __init__(self,input_size,output_size,eta=0.01):
+        self.weights=np.random.randn(output_size,input_size)*0.01
+        self.eta=eta
+    def forward(self,inputs):
+        return self.weights@inputs
+    def hebbian_update(self,inputs,outputs):
+        delta_w=self.eta*np.outer(outputs,inputs)
+        self.weights+=delta_w
+        col_sums=self.weights.sum(axis=0)+1e-8
+        self.weights=self.weights/col_sums
+
+class Neuromodulators:
+    def __init__(self,dopamine=0.5,serotonin=1.0,norepinephrine=0.3):
+        self.dopamine=dopamine
+        self.serotonin=serotonin
+        self.norepinephrine=norepinephrine
+    def modulate_parameters(self,base_lr,base_noise_std,base_dt):
+        dt=base_dt*(1.0+self.dopamine*0.5)
+        noise_std=base_noise_std*(1.0-self.serotonin*0.5)
+        lr=base_lr*(1.0+self.norepinephrine*0.2)
+        return lr, noise_std, dt
+
+class TemporalBindingPool:
+    def __init__(self):
+        self.bindings={}
+        self.pattern_strengths={}
+    def bind(self,time,patterns):
+        self.bindings[time]=set(patterns)
+        for p1 in patterns:
+            for p2 in patterns:
+                if p1!=p2:
+                    key=tuple(sorted([p1,p2]))
+                    self.pattern_strengths[key]=self.pattern_strengths.get(key,0)+1
+    def get_stable_patterns(self,threshold=3):
+        return {k:v for k,v in self.pattern_strengths.items() if v>=threshold}
+
+class PatternMetrics:
+    def __init__(self):
+        self.pattern_counts={}
+        self.transition_counts={}   
+        self.mutual_info_cache={}
+    def update(self,pattern,next_pattern=None):
+        self.pattern_counts[pattern]=self.pattern_counts.get(pattern,0)+1
+        if next_pattern:
+            key=(pattern,next_pattern)
+            self.transition_counts[key]=self.transition_counts.get(key,0)+1
+    def get_mutual_information(self,pattern1,pattern2):
+        key=tuple(sorted([pattern1,pattern2]))
+        if key in self.mutual_info_cache:
+            return self.mutual_info_cache[key]
+        p_x=self.pattern_counts.get(pattern1,0)/max(1,sum(self.pattern_counts.values()))
+        p_y=self.pattern_counts.get(pattern2,0)/max(1,sum(self.pattern_counts.values()))
+        p_xy=self.transition_counts.get((pattern1,pattern2),0)/max(1,sum(self.transition_counts.values()))
+        if p_xy>0:
+            mi=p_xy*math.log((p_xy/(p_x*p_y+1e-9))+1e-9)
+            self.mutual_info_cache[key]=mi
+            return mi
+        return 0
+
+# We can now rely on these classes as building blocks.
+
+# --- Cell 2 (code) ---
+# Make sure W is defined here, before run_phase is defined or called
+num_neurons = 200
+W = generate_fractal_connectivity(num_neurons, levels=3, block_connect_prob=0.7, sparse_prob=0.02)
+
+# Initialize neurons, motor_neuron, etc.
+neurons = [ObservableLTCNeuron(tau=1.0) for _ in range(num_neurons)]
+tokens = ['a', 'b', 'c']
+motor_neuron = MotorNeuronWithCuriosity(threshold_time=0.8, decay_rate=0.1, focus_strength=1.0, curiosity_weight=0.5)
+motor_neuron.initialize_tokens(tokens)
+
+noise_std = 0.05
+learning_rate = 0.001
+dt = 0.1
+num_steps = 600
+
+def generate_token_harmonic(token, freq_map={'a':5,'b':7,'c':3}):
+    freq = freq_map[token]
+    t = np.linspace(0,1,10)
+    signal = np.sin(2*np.pi*freq*t)
+    return signal[0]
+
+input_neurons = np.arange(0,10)
+activity_record = []
+
+def run_phase(token, steps):
+    global W
+    for _ in range(steps):
+        for tk in tokens:
+            if tk == token:
+                motor_neuron.attention_weights[tk] = 1.0
+            else:
+                motor_neuron.attention_weights[tk] = 0.01
+        motor_neuron._normalize_weights()
+
+        current_token = motor_neuron.decide_next_focus(tokens, temperature=0.5)
+        current_input_val = generate_token_harmonic(current_token)
+
+        external_input = np.zeros(num_neurons)
+        external_input[input_neurons] = current_input_val
+        external_input += np.random.randn(num_neurons)*noise_std
+
+        old_states = np.array([n.state for n in neurons])
+        # W is defined above, so now it should be accessible
+        input_vector = W.dot(old_states) + external_input
+
+        new_states=[]
+        for i, neuron in enumerate(neurons):
+            s = neuron.update(input_vector[i], dt=dt)
+            new_states.append(s)
+
+        # Hebbian update
+        W = hebbian_update(W, old_states, new_states, lr=learning_rate)
+        activity_record.append(new_states.copy())
+
+        # Simulate focus_time and prediction_error
+        focus_time = np.random.uniform(0.5,1.5) 
+        prediction_error = np.random.uniform(0.0,0.3)
+        motor_neuron.update_focus(current_token, focus_time)
+        motor_neuron.update_curiosity(current_token, prediction_error)
+
+# PHASE 1
+run_phase('a', 200)
+# PHASE 2
+run_phase('b', 200)
+# PHASE 3
+run_phase('c', 200)
+
+activity_record = np.array(activity_record)
+print("Staged input simulation complete. Now run Cell 3 to visualize results.")
+
+# --- Cell 3 (code) ---
+plt.figure(figsize=(12,5))
+plt.title("Average Activity Over Time (Baseline with Observability)")
+plt.plot(activity_record.mean(axis=1), label='Mean Activity')
+plt.xlabel('Time')
+plt.ylabel('Mean State')
+plt.grid(True)
+plt.legend()
+plt.show()
+
+plt.figure(figsize=(12,5))
+plt.title("Sample Neurons Activity (Baseline with Observability)")
+for i in range(10):
+    plt.plot(activity_record[:, i], label=f'Neuron {i}')
+plt.xlabel('Time')
+plt.ylabel('State')
+plt.grid(True)
+plt.legend()
+plt.show()
+

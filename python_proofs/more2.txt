@@ -1,0 +1,244 @@
+# --- Cell 1 (code) ---
+import time
+import math
+import numpy as np
+from collections import defaultdict
+
+
+# Liquid Time Constant Neuron
+class LTCNeuron:
+    def __init__(self, tau=1.0, alpha=0.1):
+        self.state = 0.0
+        self.tau = tau
+        self.alpha = alpha
+
+    def update(self, input_signal, dt=0.1):
+        def g(h): return -math.tanh(h)  # Nonlinear attractor function
+        dstate = (1 / self.tau) * (input_signal - self.state) + self.alpha * g(self.state)
+        self.state += dstate * dt
+        return self.state
+
+
+# Boltzmann Selector
+class BoltzmannSelector:
+    def __init__(self, temperature=1.0):
+        self.temperature = temperature
+
+    def select(self, candidates, energy_func):
+        energies = np.array([energy_func(c) for c in candidates])
+        probabilities = np.exp(-energies / self.temperature)
+        probabilities /= probabilities.sum()  # Normalize
+        return np.random.choice(candidates, p=probabilities)
+
+
+# Curiosity Mechanism
+class CuriosityMechanism:
+    def __init__(self, curiosity_weight=0.5):
+        self.novelty_scores = defaultdict(float)
+        self.curiosity_weight = curiosity_weight
+
+    def update_curiosity(self, token, prediction_error):
+        self.novelty_scores[token] += self.curiosity_weight * prediction_error
+
+    def get_curiosity(self, token):
+        return self.novelty_scores[token]
+
+
+# Prefrontal Cortex
+class PrefrontalCortex:
+    def __init__(self):
+        self.timeline = defaultdict(list)  # Time-indexed neuron activity
+        self.replay_buffer = []  # Buffer for replaying patterns
+
+    def record_state(self, t, neuron_states):
+        """
+        Record the state of neurons at time t.
+        """
+        self.timeline[t] = neuron_states
+
+    def replay(self, start_t, end_t):
+        """
+        Replay states between start_t and end_t to reinforce patterns.
+        """
+        return [self.timeline[t] for t in range(start_t, end_t + 1) if t in self.timeline]
+
+
+# Layered Language Processor
+class LayeredLanguageProcessor:
+    def __init__(self, num_layers=3, neurons_per_layer=5, temperature=1.0, curiosity_weight=0.5):
+        """
+        A multi-layer processor using chained LTC neurons.
+        """
+        self.layers = [
+            [LTCNeuron(tau=1.0 + i * 0.2) for i in range(neurons_per_layer)]
+            for _ in range(num_layers)
+        ]
+        self.selector = BoltzmannSelector(temperature=temperature)
+        self.curiosity = CuriosityMechanism(curiosity_weight=curiosity_weight)
+        self.pfc = PrefrontalCortex()  # Shared PFC for temporal binding
+        self.time_index = 0
+
+    def process_stream(self, input_stream):
+        outputs = []
+        last_time = time.time()
+
+        for input_char in input_stream:
+            # Wait for next real-time input
+            current_time = time.time()
+            dt = current_time - last_time
+            last_time = current_time
+
+            input_signal = ord(input_char) / 255.0  # Normalize input
+            layer_outputs = [input_signal]  # Input propagates through layers
+
+            # Pass through each layer
+            for layer in self.layers:
+                layer_states = []
+                for neuron in layer:
+                    state = neuron.update(layer_outputs[-1], dt)
+                    layer_states.append(state)
+                layer_outputs.append(sum(layer_states) / len(layer_states))  # Aggregate layer output
+
+            # Compute energy (inverse curiosity) for focus selection
+            def energy_func(token): return 1 - self.curiosity.get_curiosity(token)
+            focus = self.selector.select([input_char], energy_func)
+
+            # Update curiosity
+            prediction_error = abs(input_signal - ord(focus) / 255.0)
+            self.curiosity.update_curiosity(focus, prediction_error)
+
+            # Record neuron states in the PFC
+            self.pfc.record_state(self.time_index, layer_outputs)
+
+            # Record output
+            outputs.append({"focus": focus, "layer_outputs": layer_outputs})
+            self.time_index += 1
+
+        return outputs
+
+
+# Main Program
+if __name__ == "__main__":
+    # Load the document
+    document_path = "teachbaby.txt"  # Replace with the path to your document
+    with open(document_path, 'r', encoding='utf-8') as f:
+        text_stream = f.read()
+
+    # Initialize processor
+    processor = LayeredLanguageProcessor(num_layers=3, neurons_per_layer=5, temperature=0.5, curiosity_weight=0.2)
+
+    # Process the document as a stream
+    outputs = processor.process_stream(text_stream)
+
+    for t, result in enumerate(outputs):  # Print all outputs
+        print(f"Time {t}: Focus = {result['focus']}, Layer Outputs = {result['layer_outputs']}")
+
+
+
+# --- Cell 2 (code) ---
+import matplotlib.pyplot as plt
+
+def plot_layer_outputs(outputs, layers_to_plot=[1, 2, 3]):
+    for layer_idx in layers_to_plot:
+        layer_data = [output['layer_outputs'][layer_idx] for output in outputs]
+        plt.plot(layer_data, label=f'Layer {layer_idx}')
+    
+    plt.title('Layer Outputs Over Time')
+    plt.xlabel('Timestep')
+    plt.ylabel('Layer Output')
+    plt.legend()
+    plt.show()
+
+# Example usage
+plot_layer_outputs(outputs, layers_to_plot=[1, 2, 3])
+
+
+# --- Cell 3 (code) ---
+def analyze_word_patterns(outputs, input_stream, window_size=5, layer=3):
+    """
+    Analyze deeper layer outputs for word-like patterns using a sliding window.
+    """
+    word_patterns = {}
+    input_length = len(input_stream)
+    
+    for i in range(input_length - window_size + 1):
+        # Extract a sliding window of Layer 3 outputs
+        window_outputs = [outputs[j]['layer_outputs'][layer] for j in range(i, i + window_size)]
+        
+        # Concatenate input characters for reference
+        input_segment = ''.join(input_stream[i:i + window_size])
+        
+        # Store the pattern and its corresponding input segment
+        word_patterns[input_segment] = window_outputs
+    
+    return word_patterns
+
+
+# Analyze word-like patterns using a sliding window
+word_patterns = analyze_word_patterns(outputs, text_stream, window_size=5)
+
+# Print a sample of patterns
+print("Word Patterns (Sample):")
+for i, (segment, pattern) in enumerate(word_patterns.items()):
+    if i < 10:  # Limit to first 10 for brevity
+        print(f"Input: {segment}, Layer Outputs: {pattern}")
+
+
+
+# --- Cell 4 (code) ---
+from sklearn.cluster import KMeans
+import numpy as np
+
+def cluster_layer_outputs(outputs, layer=3, n_clusters=10):
+    """
+    Cluster the outputs of a specified layer using k-means.
+    """
+    # Extract Layer 3 outputs
+    layer_outputs = [output['layer_outputs'][layer] for output in outputs]
+    layer_outputs = np.array(layer_outputs).reshape(-1, 1)  # Reshape for clustering
+    
+    # Perform k-means clustering
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+    labels = kmeans.fit_predict(layer_outputs)
+    
+    return labels
+
+
+# Cluster Layer 3 outputs
+cluster_labels = cluster_layer_outputs(outputs, layer=3)
+
+# Print a sample of cluster assignments
+print("Cluster Assignments (Sample):")
+for i, label in enumerate(cluster_labels[:100]):  # Limit to first 100
+    print(f"Timestep {i}: Cluster {label}")
+
+
+# --- Cell 5 (code) ---
+def detect_word_boundaries(outputs, layer=3, threshold=1e-10):
+    """
+    Detect word boundaries based on drops or spikes in deeper layer activations.
+    """
+    boundaries = []
+    prev_value = outputs[0]['layer_outputs'][layer]
+    
+    for t, output in enumerate(outputs[1:], start=1):
+        current_value = output['layer_outputs'][layer]
+        if abs(current_value - prev_value) > threshold:
+            boundaries.append(t)  # Mark a boundary
+        prev_value = current_value
+    
+    return boundaries
+
+# Detect boundaries in Layer 3 outputs
+word_boundaries = detect_word_boundaries(outputs, layer=3)
+
+# Print detected boundaries
+print("Detected Word Boundaries:")
+print(word_boundaries)
+
+
+
+# --- Cell 6 (code) ---
+plot_layer_outputs(outputs, layers_to_plot=[1, 2, 3])
+
+

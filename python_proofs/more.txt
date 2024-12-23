@@ -1,0 +1,410 @@
+# --- Cell 1 (code) ---
+import math
+
+class WordBoundaryDetector:
+    def __init__(self, threshold=0.1, attention_decay=0.1):
+        self.threshold = threshold
+        self.attention_decay = attention_decay
+        self.attention_map = {}
+        self.boundaries = []
+        
+    def process_stream(self, text_stream):
+        # Initialize attention for each character
+        for char in text_stream:
+            if char not in self.attention_map:
+                self.attention_map[char] = 1.0  # Start with full attention
+
+        # Process character stream
+        for i, char in enumerate(text_stream):
+            # Update attention based on character type
+            if char == ' ':
+                # Spaces get boring quickly
+                self.attention_map[char] *= (1 - self.attention_decay)
+            elif char in '.!?,;':
+                # Punctuation maintains moderate attention as flavor
+                self.attention_map[char] = max(0.5, self.attention_map[char])
+            else:
+                # Letters maintain attention based on novelty
+                prev_char = text_stream[i-1] if i > 0 else None
+                next_char = text_stream[i+1] if i < len(text_stream)-1 else None
+                
+                # Compute energy gradient
+                energy = self.compute_energy(char, prev_char, next_char)
+                probability = self.boltzmann(energy)
+                
+                # Update attention based on probability
+                self.attention_map[char] *= probability
+
+        # Find word boundaries using attention gradients
+        return self.detect_boundaries(text_stream)
+
+    def compute_energy(self, char, prev_char, next_char):
+        # Energy is lower (more favorable) for:
+        # - Letters that form common patterns
+        # - Characters that maintain meaning
+        base_energy = -self.attention_map[char]
+        
+        # Adjust for context
+        if prev_char:
+            base_energy -= 0.5 * self.attention_map[prev_char]
+        if next_char:
+            base_energy -= 0.5 * self.attention_map[next_char]
+            
+        return base_energy
+
+    def boltzmann(self, energy, temperature=0.5):
+        return math.exp(-energy / temperature)
+
+    def detect_boundaries(self, text_stream):
+        words = []
+        current_word = []
+        attention_threshold = sum(self.attention_map.values()) / len(self.attention_map)
+
+        for i, char in enumerate(text_stream):
+            if self.attention_map[char] > attention_threshold:
+                # High attention character - part of a word
+                current_word.append(char)
+            else:
+                # Low attention (like space) - potential boundary
+                if current_word:
+                    words.append(''.join(current_word))
+                    current_word = []
+                    
+                if char not in ' \n\t':  # Keep punctuation as separate tokens
+                    words.append(char)
+
+        if current_word:  # Don't forget last word
+            words.append(''.join(current_word))
+
+        return words
+
+    def visualize_attention(self):
+        # Return attention values for visualization
+        return self.attention_map
+    
+class LTCNeuron:
+    def __init__(self, tau=1.0, context_size=3):
+        self.state = 0
+        self.tau = tau
+        self.context_window = []
+        self.context_size = context_size
+        self.prediction_history = []
+        self.consolidated_patterns = {}  # pattern -> frequency
+        self.stable_states = set()  # Consolidated memory states
+
+    def update(self, input_signal, context, dt):
+        # Update context window
+        self.context_window.append(input_signal)
+        if len(self.context_window) > self.context_size:
+            self.context_window.pop(0)
+
+        # Predict based on context history
+        prediction = self.predict_next(context)
+        self.prediction_history.append((prediction, input_signal))
+
+        # LTC dynamics with context influence
+        context_influence = sum(c * 0.1 for c in context)
+        self.state += (1/self.tau) * (input_signal + context_influence - self.state) * dt
+
+        # Check for pattern consolidation
+        self.consolidate_if_stable()
+
+        return self.state, prediction
+
+    def predict_next(self, context):
+        if not self.prediction_history:
+            return 0
+
+        # Look for similar contexts in history
+        similar_contexts = []
+        for pred, actual in self.prediction_history[-10:]:  # Last 10 predictions
+            if self.context_matches(context):
+                similar_contexts.append(actual)
+
+        return sum(similar_contexts) / len(similar_contexts) if similar_contexts else 0
+
+    def consolidate_if_stable(self, stability_threshold=3):
+        if len(self.context_window) < self.context_size:
+            return
+
+        pattern = tuple(self.context_window)
+        self.consolidated_patterns[pattern] = self.consolidated_patterns.get(pattern, 0) + 1
+
+        if self.consolidated_patterns[pattern] >= stability_threshold:
+            self.stable_states.add(pattern)
+
+class TemporalBindingPool:
+    def __init__(self):
+        self.bindings = {}  # time -> set of active patterns
+        self.pattern_strengths = {}  # pattern -> strength
+
+    def bind(self, time, patterns):
+        self.bindings[time] = set(patterns)
+        
+        # Strengthen co-occurring patterns
+        for p1 in patterns:
+            for p2 in patterns:
+                if p1 != p2:
+                    key = (min(p1, p2), max(p1, p2))
+                    self.pattern_strengths[key] = self.pattern_strengths.get(key, 0) + 1
+
+    def get_stable_patterns(self, threshold=3):
+        return {k: v for k, v in self.pattern_strengths.items() if v >= threshold}
+
+class EnhancedCuriosityDrivenSegmenter:
+    def __init__(self, temperature=0.5):
+        self.neurons = {}
+        self.temporal_binding = TemporalBindingPool()
+        self.temperature = temperature
+        self.time_index = 0
+        self.memory_cache = {}  # Consolidated patterns cache
+
+    def process_sequence(self, text, dt=0.1):
+        context_window = []
+        consolidated_segments = []
+
+        for i, char in enumerate(text):
+            # Get context
+            context = text[max(0, i-3):i]
+            context_window.append(char)
+            
+            # Process through neurons
+            neuron = self.get_or_create_neuron(char)
+            state, prediction = neuron.update(1.0, context, dt)
+            
+            # Check for consolidated patterns
+            if len(context_window) >= 3:
+                pattern = tuple(context_window[-3:])
+                if pattern in self.memory_cache:
+                    # Recognized pattern - use consolidated representation
+                    consolidated_segments.append(self.memory_cache[pattern])
+                    context_window = []  # Reset window after recognition
+                elif self.is_stable_pattern(pattern):
+                    # New stable pattern found - consolidate to memory
+                    self.memory_cache[pattern] = ''.join(pattern)
+                    consolidated_segments.append(self.memory_cache[pattern])
+                    context_window = []
+
+            # Temporal binding
+            active_patterns = self.get_active_patterns(context_window)
+            self.temporal_binding.bind(self.time_index, active_patterns)
+            
+            self.time_index += 1
+
+        return consolidated_segments, self.temporal_binding.get_stable_patterns()
+
+    def is_stable_pattern(self, pattern):
+        # Check if pattern appears in multiple neurons' stable states
+        stability_count = 0
+        for neuron in self.neurons.values():
+            if pattern in neuron.stable_states:
+                stability_count += 1
+        return stability_count >= 2  # Pattern is stable if recognized by multiple neurons
+
+    def get_active_patterns(self, window):
+        patterns = set()
+        for i in range(len(window)):
+            for j in range(i + 1, len(window) + 1):
+                patterns.add(tuple(window[i:j]))
+        return patterns
+    
+class PatternMetrics:
+    def __init__(self):
+        self.pattern_counts = {}
+        self.transition_counts = {}
+        self.mutual_info_cache = {}
+        
+    def update(self, pattern, next_pattern=None):
+        # Update pattern frequencies
+        self.pattern_counts[pattern] = self.pattern_counts.get(pattern, 0) + 1
+        
+        if next_pattern:
+            # Track transitions for conditional probability
+            key = (pattern, next_pattern)
+            self.transition_counts[key] = self.transition_counts.get(key, 0) + 1
+    
+    def get_mutual_information(self, pattern1, pattern2):
+        key = (min(pattern1, pattern2), max(pattern1, pattern2))
+        if key in self.mutual_info_cache:
+            return self.mutual_info_cache[key]
+            
+        # Calculate mutual information
+        p_x = self.pattern_counts.get(pattern1, 0) / sum(self.pattern_counts.values())
+        p_y = self.pattern_counts.get(pattern2, 0) / sum(self.pattern_counts.values())
+        p_xy = self.transition_counts.get((pattern1, pattern2), 0) / sum(self.transition_counts.values())
+        
+        if p_xy > 0:
+            mi = p_xy * math.log(p_xy / (p_x * p_y))
+            self.mutual_info_cache[key] = mi
+            return mi
+        return 0
+
+class HierarchicalPattern:
+    def __init__(self, base_pattern):
+        self.base = base_pattern
+        self.children = []
+        self.parent = None
+        self.stability_score = 0
+        self.level = 0
+
+    def add_child(self, child):
+        self.children.append(child)
+        child.parent = self
+        child.level = self.level + 1
+
+class AdaptiveTemperature:
+    def __init__(self, initial_temp=0.5, min_temp=0.1, max_temp=2.0):
+        self.temperature = initial_temp
+        self.min_temp = min_temp
+        self.max_temp = max_temp
+        self.stability_history = []
+        self.novelty_rate = 0
+
+    def update(self, stability_score, novelty_score):
+        self.stability_history.append(stability_score)
+        self.novelty_rate = novelty_score
+        
+        if len(self.stability_history) > 10:  # Rolling window
+            avg_stability = sum(self.stability_history[-10:]) / 10
+            
+            # Adjust temperature based on stability and novelty
+            if avg_stability > 0.8 and self.novelty_rate < 0.2:
+                # Very stable, increase temperature to encourage exploration
+                self.temperature = min(self.temperature * 1.1, self.max_temp)
+            elif avg_stability < 0.3 or self.novelty_rate > 0.8:
+                # Unstable or too much novelty, decrease temperature
+                self.temperature = max(self.temperature * 0.9, self.min_temp)
+
+class EnhancedCuriosityDrivenSegmenter:
+    def __init__(self):
+        self.neurons = {}
+        self.pattern_metrics = PatternMetrics()
+        self.hierarchy = {}  # level -> patterns
+        self.temperature = AdaptiveTemperature()
+        
+    def process_sequence(self, text, dt=0.1):
+        current_level_patterns = []
+        stability_scores = []
+        
+        for level in range(3):  # Process multiple hierarchical levels
+            patterns = self.process_level(text, level, current_level_patterns)
+            current_level_patterns = patterns
+            
+            # Calculate stability for temperature adjustment
+            stability = self.calculate_level_stability(patterns)
+            stability_scores.append(stability)
+            
+            # Update temperature based on stability and novelty
+            novelty = self.calculate_novelty_rate(patterns)
+            self.temperature.update(stability, novelty)
+            
+            # Store patterns in hierarchy
+            self.hierarchy[level] = patterns
+            
+            # If patterns are very stable, use them as base units for next level
+            if stability > 0.8:
+                text = self.reconstruct_text_from_patterns(patterns)
+        
+        return self.hierarchy
+
+    def calculate_level_stability(self, patterns):
+        if not patterns:
+            return 0
+            
+        stable_count = sum(1 for p in patterns if self.is_stable_pattern(p))
+        return stable_count / len(patterns)
+
+    def calculate_novelty_rate(self, patterns):
+        known_patterns = set(self.pattern_metrics.pattern_counts.keys())
+        novel_count = sum(1 for p in patterns if p not in known_patterns)
+        return novel_count / len(patterns) if patterns else 0
+
+    def is_stable_pattern(self, pattern):
+        # Check multiple stability criteria
+        frequency_stable = self.pattern_metrics.pattern_counts.get(pattern, 0) > 3
+        
+        # Check predictive power using mutual information
+        if frequency_stable:
+            mi_scores = []
+            for other_pattern in self.pattern_metrics.pattern_counts:
+                if other_pattern != pattern:
+                    mi = self.pattern_metrics.get_mutual_information(pattern, other_pattern)
+                    mi_scores.append(mi)
+            
+            predictive_power = sum(mi_scores) / len(mi_scores) if mi_scores else 0
+            return predictive_power > 0.3
+        
+        return False
+
+    def reconstruct_text_from_patterns(self, patterns):
+        # Convert stable patterns to tokens for next level
+        return ' '.join(str(p) for p in patterns)
+
+# --- Cell 2 (code) ---
+%matplotlib inline
+import matplotlib.pyplot as plt
+from ipywidgets import interactive, FloatSlider, HBox, VBox, IntSlider
+import numpy as np
+
+# Synthetic data function:
+# Simulate attention weights and novelty scores over iterations.
+def simulate_data(num_iterations=100, temperature=0.5, decay_rate=0.1):
+    # For demonstration, we'll create a set of patterns:
+    patterns = ["A", "B", "C", "D", " "]
+    # Start attention weights uniformly
+    attention = {p: [1.0 for _ in range(num_iterations)] for p in patterns}
+    novelty = {p: [0.0 for _ in range(num_iterations)] for p in patterns}
+
+    for t in range(1, num_iterations):
+        for p in patterns:
+            # Attention update simulation:
+            # Decrease attention for space due to boredom:
+            if p == " ":
+                attention[p][t] = attention[p][t-1] * (1 - decay_rate)
+            else:
+                # Add some random fluctuation influenced by temperature
+                fluct = np.random.normal(0, 0.1 * (1/temperature))
+                attention[p][t] = max(0, attention[p][t-1] + fluct)
+
+            # Novelty score simulation:
+            # If attention spikes or drops significantly, treat it as a novelty sign:
+            change = abs(attention[p][t] - attention[p][t-1])
+            novelty[p][t] = max(0, novelty[p][t-1] * 0.9 + change * 0.5)
+
+    return patterns, attention, novelty
+
+def plot_data(num_iterations=100, temperature=0.5, decay_rate=0.1):
+    patterns, attention, novelty = simulate_data(num_iterations, temperature, decay_rate)
+
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 6))
+    
+    # Plot attention over time
+    for p in patterns:
+        ax1.plot(range(num_iterations), attention[p], label=f"{p!r} Attn")
+    ax1.set_title("Attention Weights Over Time")
+    ax1.set_xlabel("Iterations")
+    ax1.set_ylabel("Attention Weight")
+    ax1.grid(True)
+    ax1.legend()
+
+    # Plot novelty over time
+    for p in patterns:
+        ax2.plot(range(num_iterations), novelty[p], label=f"{p!r} Novelty")
+    ax2.set_title("Novelty Scores Over Time")
+    ax2.set_xlabel("Iterations")
+    ax2.set_ylabel("Novelty")
+    ax2.grid(True)
+    ax2.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+# Create sliders to adjust parameters interactively
+temp_slider = FloatSlider(value=0.5, min=0.1, max=2.0, step=0.1, description='Temp:')
+decay_slider = FloatSlider(value=0.1, min=0.01, max=0.5, step=0.01, description='Decay:')
+iter_slider = IntSlider(value=100, min=50, max=500, step=50, description='Iterations:')
+
+ui = VBox([iter_slider, temp_slider, decay_slider])
+out = interactive(plot_data, num_iterations=iter_slider, temperature=temp_slider, decay_rate=decay_slider)
+display(out)
+

@@ -41,10 +41,12 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * Jean-loup Gailly(jloup@gzip.org) and Mark Adler(madler@alumni.caltech.edu)
 * and contributors of zlib.
 */
-package ComponentAce.Compression.Libs.zlib
+package componentace.compression.libs.zlib.deflate
+
+import componentace.compression.libs.zlib.deflate.Tree
 
 class Deflate {
-    
+
     private val MAX_MEM_LEVEL = 9
     private val Z_DEFAULT_COMPRESSION = -1
     private val MAX_WBITS = 15 // 32K LZ77 window
@@ -856,7 +858,8 @@ class Deflate {
             }
 
             if (lookahead >= MIN_MATCH) {
-                ins_h = (((ins_h shl hash_shift) xor (window[(strstart) + (MIN_MATCH - 1)].toInt() and 0xff)) and hash_mask)
+                ins_h =
+                    (((ins_h shl hash_shift) xor (window[(strstart) + (MIN_MATCH - 1)].toInt() and 0xff)) and hash_mask)
 
                 hash_head = (head[ins_h].toInt() and 0xffff)
                 prev[strstart and w_mask] = head[ins_h]
@@ -878,7 +881,8 @@ class Deflate {
                     do {
                         strstart++
 
-                        ins_h = (((ins_h shl hash_shift) xor (window[(strstart) + (MIN_MATCH - 1)].toInt() and 0xff)) and hash_mask)
+                        ins_h =
+                            (((ins_h shl hash_shift) xor (window[(strstart) + (MIN_MATCH - 1)].toInt() and 0xff)) and hash_mask)
                         hash_head = (head[ins_h].toInt() and 0xffff)
                         prev[strstart and w_mask] = head[ins_h]
                         head[ins_h] = strstart.toShort()
@@ -925,7 +929,8 @@ class Deflate {
             }
 
             if (lookahead >= MIN_MATCH) {
-                ins_h = (((ins_h shl hash_shift) xor (window[(strstart) + (MIN_MATCH - 1)].toInt() and 0xff)) and hash_mask)
+                ins_h =
+                    (((ins_h shl hash_shift) xor (window[(strstart) + (MIN_MATCH - 1)].toInt() and 0xff)) and hash_mask)
                 hash_head = (head[ins_h].toInt() and 0xffff)
                 prev[strstart and w_mask] = head[ins_h]
                 head[ins_h] = strstart.toShort()
@@ -954,7 +959,8 @@ class Deflate {
                 prev_length -= 2
                 do {
                     if (++strstart <= max_insert) {
-                        ins_h = (((ins_h shl hash_shift) xor (window[(strstart) + (MIN_MATCH - 1)].toInt() and 0xff)) and hash_mask)
+                        ins_h =
+                            (((ins_h shl hash_shift) xor (window[(strstart) + (MIN_MATCH - 1)].toInt() and 0xff)) and hash_mask)
                         hash_head = (head[ins_h].toInt() and 0xffff)
                         prev[strstart and w_mask] = head[ins_h]
                         head[ins_h] = strstart.toShort()
@@ -1322,7 +1328,7 @@ class Deflate {
 
         internal fun smaller(tree: ShortArray, n: Int, m: Int, depth: ByteArray): Boolean {
             return tree[n * 2].toInt() < tree[m * 2].toInt() ||
-                (tree[n * 2].toInt() == tree[m * 2].toInt() && depth[n] <= depth[m])
+                    (tree[n * 2].toInt() == tree[m * 2].toInt() && depth[n] <= depth[m])
         }
     }
 }

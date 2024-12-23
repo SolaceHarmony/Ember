@@ -1,0 +1,163 @@
+# --- Cell 1 (code) ---
+import numpy as np
+from transformers import AutoTokenizer, AutoModel
+import torch
+from collections import defaultdict
+import torch.optim as optim
+from torch.nn.functional import mse_loss
+class HarmonicEmbeddingCache:
+    def __init__(self, num_tokens=50_000, original_dim=768, num_harmonics=16):
+        self.num_tokens = num_tokens
+        self.original_dim = original_dim
+        self.num_harmonics = num_harmonics
+        self.cache = defaultdict(dict)  # Cache for harmonic wave parameters
+        self.embedding_cache = {}       # Cache for original transformer embeddings
+
+    def generate_embedding(self, token, model, tokenizer):
+        # Check if the token embedding is already cached
+        if token in self.embedding_cache:
+            return self.embedding_cache[token]
+
+        # Generate embedding if it's not in the cache
+        inputs = tokenizer(token, return_tensors="pt", padding=True, truncation=True)
+        with torch.no_grad():
+            outputs = model(**inputs)
+            embedding = outputs.last_hidden_state[:, 0, :].numpy().flatten()  # Use CLS token
+
+        # Cache the generated embedding
+        self.embedding_cache[token] = embedding
+        return embedding
+
+    def encode_embedding(self, embedding):
+        # Encode embedding into harmonic parameters (amplitudes, frequencies, phases)
+        assert len(embedding) == self.original_dim, f"Embedding must have dimension {self.original_dim}"
+
+        amplitudes = np.zeros(self.num_harmonics)
+        frequencies = np.zeros(self.num_harmonics)
+        phases = np.zeros(self.num_harmonics)
+
+        for h in range(self.num_harmonics):
+            base_freq = 2.0 ** (h / self.num_harmonics)
+            window_size = self.original_dim // self.num_harmonics
+            start, end = h * window_size, min((h + 1) * window_size, self.original_dim)
+            slice_ = embedding[start:end]
+
+            amplitudes[h] = np.mean(slice_)
+            frequencies[h] = base_freq
+            phases[h] = np.arctan2(np.sum(slice_), np.sum(np.abs(slice_)))
+
+        return {"amplitudes": amplitudes, "frequencies": frequencies, "phases": phases}
+
+    def cache_embedding(self, token, embedding):
+        # Cache the harmonic wave representation of the embedding
+        wave_params = self.encode_embedding(embedding)
+        self.cache[token] = wave_params
+
+    def get_embedding(self, token):
+        # Retrieve the harmonic embedding from the cache
+        if token in self.cache:
+            return self.decode_embedding(self.cache[token])
+        return None
+
+    def decode_embedding(self, params, t=1.0):
+        # Reconstruct the original embedding from the harmonic parameters
+        reconstructed = np.zeros(self.original_dim)
+        for h in range(self.num_harmonics):
+            window_size = self.original_dim // self.num_harmonics
+            start, end = h * window_size, min((h + 1) * window_size, self.original_dim)
+            wave = params["amplitudes"][h] * np.sin(2 * np.pi * params["frequencies"][h] * t + params["phases"][h])
+            reconstructed[start:end] = wave
+
+        return reconstructed
+
+
+# --- Cell 2 (code) ---
+import numpy as np
+import torch
+import torch.optim as optim
+from torch.nn.functional import mse_loss
+from transformers import AutoTokenizer, AutoModel
+
+# Harmonic cache instance
+harmonic_cache = HarmonicEmbeddingCache(original_dim=768)
+
+# Example token list for training
+tokens = ["The quick brown fox", "AI is transforming the world", "Deep learning models are powerful"]
+
+# Initialize Transformer model and tokenizer
+model_name = "bert-base-uncased"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModel.from_pretrained(model_name)
+
+# Dictionary to store cached embeddings
+embedding_cache = {}
+
+# Learning rate and optimizer setup
+learning_rate = 0.001
+
+def generate_embedding(token):
+    """
+    Generate or retrieve an embedding for a given token.
+    Uses a local cache to avoid redundant computations.
+    """
+    if token in embedding_cache:
+        return embedding_cache[token]
+    else:
+        # Generate and cache embedding
+        inputs = tokenizer(token, return_tensors="pt", padding=True, truncation=True)
+        outputs = model(**inputs)
+        embedding = outputs.last_hidden_state[:, 0, :].detach().numpy()
+        embedding_cache[token] = embedding
+        return embedding
+
+def train_loop(tokens, epochs=10):
+    """
+    Training loop for using harmonic embeddings from a cached embedding source.
+    """
+    for epoch in range(epochs):
+        total_loss = 0
+        for token in tokens:
+            # Get embedding from cache or generate it if not cached
+            embedding = generate_embedding(token)
+            
+            # Convert embedding to PyTorch tensor
+            embedding_tensor = torch.tensor(embedding, dtype=torch.float32)
+
+            # Initialize harmonic parameters as PyTorch tensors with gradients enabled
+            amplitudes = torch.randn(harmonic_cache.num_harmonics, requires_grad=True)
+            frequencies = torch.randn(harmonic_cache.num_harmonics, requires_grad=True)
+            phases = torch.randn(harmonic_cache.num_harmonics, requires_grad=True)
+
+            # Define the optimizer for these parameters
+            optimizer = optim.Adam([amplitudes, frequencies, phases], lr=learning_rate)
+
+            # Zero the gradients
+            optimizer.zero_grad()
+
+            # Calculate the predicted embedding from the harmonic parameters
+            # Using a similar approach as decode_embedding but with PyTorch tensors
+            reconstructed = torch.zeros(harmonic_cache.original_dim, requires_grad=False)
+
+            window_size = harmonic_cache.original_dim // harmonic_cache.num_harmonics
+            for h in range(harmonic_cache.num_harmonics):
+                start, end = h * window_size, min((h + 1) * window_size, harmonic_cache.original_dim)
+                wave = amplitudes[h] * torch.sin(2 * torch.pi * frequencies[h] * 1.0 + phases[h])
+                reconstructed[start:end] = wave
+
+            # Compute the loss between the target embedding and the reconstructed embedding
+            loss = mse_loss(reconstructed, embedding_tensor)
+
+            # Backpropagate the loss
+            loss.backward()
+
+            # Update the parameters
+            optimizer.step()
+
+            # Accumulate loss
+            total_loss += loss.item()
+
+        print(f"Epoch {epoch + 1}/{epochs}, Loss: {total_loss / len(tokens)}")
+
+train_loop(tokens, epochs=100)
+
+

@@ -1,0 +1,42 @@
+# --- Cell 1 (code) ---
+import numpy as np
+
+T = 1.0
+N_t = 100
+t_grid = np.linspace(0, T, N_t)
+
+N_x = 100
+x_grid = np.linspace(-1, 1, N_x)
+
+N_modes = 50
+alpha = np.arange(1, N_modes+1)  # simple increasing
+
+# Mock bounded functions
+def Psi(x, t, i):
+    return np.sin(x * i) * np.cos(t)  # bounded
+
+def W_tilde(i, j):
+    return np.exp(-(i-j)**2)  # Gaussian, bounded
+
+def theta(i, j):
+    return (i+j)*np.pi/4  # arbitrary phase
+
+def h_t_dot(x, t, i):
+    # some bounded derivative mock
+    return 0.1*np.cos(x*i)*np.sin(t)
+
+S_approx = 0.0
+for ti in t_grid:
+    for x in x_grid:
+        accum = 0.0
+        for i in range(N_modes):
+            # Approximate W_ij cos(theta_ij) by just W_ii for simplicity
+            val = Psi(x, ti, i+1) + W_tilde(i+1, i+1)*np.cos(theta(i+1, i+1))
+            val -= 0.5*0.1*(h_t_dot(x, ti, i+1)**2)  # tau = 0.1 for example
+            accum += np.exp(-alpha[i]*val)
+        S_approx += accum
+S_approx /= (N_t*N_x)  # crude approximation of integral average
+
+print("Approximate S:", S_approx)
+
+

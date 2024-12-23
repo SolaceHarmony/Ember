@@ -80,7 +80,7 @@ object AlphaTensorMM {
         jobs.joinAll()
     }
 
-    private suspend fun multiplyBlock(
+    private fun multiplyBlock(
         a: FloatArray,
         b: FloatArray,
         c: FloatArray,

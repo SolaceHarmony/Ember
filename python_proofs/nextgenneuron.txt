@@ -1,0 +1,206 @@
+# --- Cell 1 (code) ---
+import numpy as np
+from typing import Dict, List, Tuple
+from dataclasses import dataclass
+
+@dataclass
+class AttentionState:
+    temporal_weight: float = 0.0    # Recent history importance
+    causal_weight: float = 0.0      # Prediction accuracy impact
+    novelty_weight: float = 0.0     # Curiosity factor
+    
+    def compute_total(self) -> float:
+        return (
+            self.temporal_weight +
+            self.causal_weight +
+            self.novelty_weight
+        ) / 3.0
+
+class CausalAttention:
+    def __init__(self,
+                 decay_rate: float = 0.1,
+                 novelty_threshold: float = 0.3,
+                 memory_length: int = 100):
+        self.states: Dict[int, AttentionState] = {}
+        self.history: List[Tuple[int, float]] = []
+        self.decay_rate = decay_rate
+        self.novelty_threshold = novelty_threshold
+        self.memory_length = memory_length
+    
+    def update(self, neuron_id: int, prediction_error: float, current_state: float, target_state: float) -> float:
+        state = self.states.get(neuron_id, AttentionState())
+        
+        # Update temporal weight
+        temporal_decay = np.exp(-self.decay_rate * len(self.history))
+        state.temporal_weight = current_state * temporal_decay
+        
+        # Update causal weight
+        prediction_accuracy = 1.0 - min(abs(prediction_error), 1.0)
+        state.causal_weight = prediction_accuracy
+        
+        # Update novelty weight
+        novelty = abs(target_state - current_state)
+        if novelty > self.novelty_threshold:
+            state.novelty_weight = novelty
+        else:
+            state.novelty_weight *= (1 - self.decay_rate)
+        
+        # Store updated state
+        self.states[neuron_id] = state
+        
+        # Update history
+        total_attention = state.compute_total()
+        self.history.append((neuron_id, total_attention))
+        if len(self.history) > self.memory_length:
+            self.history.pop(0)
+        
+        return total_attention
+
+class LTCNeuronWithAttention:
+    def __init__(self, 
+                 neuron_id: int,
+                 tau: float = 1.0):
+        self.id = neuron_id
+        self.tau = tau
+        self.state = 0.0
+        self.attention = CausalAttention()
+        self.last_prediction = 0.0
+        
+    def update(self, input_signal: float, dt: float) -> float:
+        # Calculate prediction error
+        prediction_error = input_signal - self.last_prediction
+        
+        # Update attention 
+        attention_value = self.attention.update(
+            neuron_id=self.id,
+            prediction_error=prediction_error,
+            current_state=self.state,
+            target_state=input_signal
+        )
+        
+        # Modulate time constant
+        effective_tau = self.tau * (1.0 - 0.3 * attention_value)
+        
+        # Update LTC dynamics
+        d_state = (1.0/effective_tau) * (
+            input_signal * (1.0 + attention_value) - self.state
+        ) * dt
+        
+        self.state += d_state
+        self.last_prediction = self.state
+        
+        return self.state
+class AttentiveNetwork:
+    def __init__(self, num_neurons: int = 3, base_tau: float = 1.0):
+        # Create main neurons
+        self.neurons = [ LTCNeuronWithAttention(i, base_tau * (1 + 0.2 * i)) for i in range(num_neurons)]
+        self.num_neurons = num_neurons
+        # Initialize histories for visualization
+        self.state_history = []
+        self.attention_history = []
+        self.input_history = []
+        self.time_steps = []
+        self.current_step = 0
+
+    def update_step(self, input_signals: List[float], dt: float = 0.1) -> List[float]:
+        states = []
+        attention_values = []
+        
+        for i, neuron in enumerate(self.neurons):
+            # Get input for this neuron
+            input_signal = input_signals[i] if i < len(input_signals) else 0.0
+            
+            # Update neuron state
+            state = neuron.update(input_signal, dt)
+            states.append(state)
+            
+            # Get attention value
+            attention = neuron.attention.states.get(
+                neuron.id, AttentionState()).compute_total()
+            attention_values.append(attention)
+
+        # Record histories
+        self.state_history.append(states)
+        self.attention_history.append(attention_values)
+        self.input_history.append(input_signals)
+        self.time_steps.append(self.current_step)
+        self.current_step += 1
+            
+        return states
+
+    def plot_results(self):
+        """Visualize network behavior"""
+        import matplotlib.pyplot as plt
+        
+        fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12, 10))
+        
+        # Convert histories to numpy arrays for easier plotting
+        states = np.array(self.state_history)
+        attention = np.array(self.attention_history)
+        inputs = np.array(self.input_history)
+        
+        # Plot states
+        for i in range(self.num_neurons):
+            ax1.plot(self.time_steps, states[:, i], label=f'Neuron {i}')
+        ax1.set_title('Neuron States')
+        ax1.set_xlabel('Time Step')
+        ax1.set_ylabel('State')
+        ax1.legend()
+        ax1.grid(True)
+        
+        # Plot attention
+        for i in range(self.num_neurons):
+            ax2.plot(self.time_steps, attention[:, i], label=f'Attention {i}')
+        ax2.set_title('Attention Values')
+        ax2.set_xlabel('Time Step')
+        ax2.set_ylabel('Attention')
+        ax2.legend()
+        ax2.grid(True)
+        
+        # Plot inputs
+        for i in range(self.num_neurons):
+            ax3.plot(self.time_steps, inputs[:, i], label=f'Input {i}')
+        ax3.set_title('Input Signals')
+        ax3.set_xlabel('Time Step')
+        ax3.set_ylabel('Input Value')
+        ax3.legend()
+        ax3.grid(True)
+        
+        plt.tight_layout()
+        plt.show()
+
+def generate_input_patterns(num_steps: int, num_neurons: int, 
+                        freq: float = 0.1, dt: float = 0.1) -> List[List[float]]:
+    """Generate structured input patterns for testing"""
+    input_patterns = []
+    for step in range(num_steps):
+        t = step * dt
+        inputs = [
+            0.5 + 0.5 * np.sin(2 * np.pi * freq * t),  # Sine wave
+            0.5 + 0.5 * np.cos(2 * np.pi * freq * t),  # Cosine wave
+            0.5 + 0.25 * (np.sin(2 * np.pi * freq * 2 * t) +  # Complex pattern
+                        np.cos(2 * np.pi * freq * t))
+        ][:num_neurons]  # Truncate to number of neurons
+        input_patterns.append(inputs)
+    return input_patterns
+
+def run_simulation(network: AttentiveNetwork, 
+                  steps: int = 200, 
+                  dt: float = 0.1,
+                  input_freq: float = 0.05) -> None:
+    """Run simulation with generated input patterns"""
+    input_patterns = generate_input_patterns(steps, network.num_neurons, 
+                                          freq=input_freq, dt=dt)
+    
+    print("Running simulation...")
+    for inputs in input_patterns:
+        network.update_step(inputs, dt)
+    
+    print("Plotting results...")
+    network.plot_results()
+
+if __name__ == "__main__":
+    # Create and run network
+    network = AttentiveNetwork(num_neurons=3)
+    run_simulation(network)
+
