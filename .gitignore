@@ -48,3 +48,4 @@ mainJvm/kotlin/src/ai/solace/core/kognitive/.DS_Store
 native/.DS_Store
 python_proofs/.DS_Store
 .DS_Store
+python_proofs/infinitemath/__pycache__/bigbase65536.cpython-312.pyc
