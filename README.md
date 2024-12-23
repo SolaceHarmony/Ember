@@ -1,4 +1,4 @@
-# Solace of Harmony: LTC Based Neural Network in Pure Kotlin Native
+# Solace of Harmony: LTC Inspired Neural Network in Pure Kotlin Native
 
 A pure Kotlin implementation of a hybrid neural network architecture combining Liquid Neural Networks with Transformers, targeting Apple Silicon with native performance.
 
