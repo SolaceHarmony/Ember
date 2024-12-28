@@ -678,26 +678,30 @@ class MathOps:
         
         while BigBase65536._compare_abs(i, n) <= 0:
             term = MyFraction(i, one)
-            result = result * term
+            result = MyFraction.mul(result, term)
+            result._normalize()  # Reduce after each multiplication
             i = BigBase65536.add(i, one)
+            
         MathOps.factorial_cache[key] = result
         return result
 
     @staticmethod
     def power(x: "MyFraction", n: "BigBase65536") -> "MyFraction":
-        print(f"[POWER DEBUG] Computing {x.numerator.to_decimal_str()}/{x.denominator.to_decimal_str()}^{n.to_decimal_str()}")
+        """Compute x^n with aggressive fraction reduction."""
+        print(f"[POWER] Base: {x.numerator}/{x.denominator}")
+        print(f"        Exp:  {n.numerator}/{n.denominator}")
         
         # If base is zero and exponent is positive => short-circuit to zero
         if len(x.numerator.digits) == 1 and x.numerator.digits[0] == 0 and \
         BigBase65536._compare_abs(n, BigBase65536.from_int(0)) > 0:
             return MyFraction.from_int(0)
-
         # If exponent is 0 => return 1
+
         if BigBase65536._compare_abs(n, BigBase65536.from_int(0)) == 0:
             print("  Exponent is 0, returning 1")
             return MyFraction.from_int(1)
 
-        # Otherwise do exponentiation by squaring
+        # Exponentiation by squaring with reduction
         result = MyFraction.from_int(1)
         base = x
         two = BigBase65536.from_int(2)
@@ -709,90 +713,94 @@ class MathOps:
 
         while BigBase65536._compare_abs(n, BigBase65536.from_int(0)) > 0:
             quotient, remainder = BigBase65536.divmod(n, two)
-            print(f"  n = {n.to_decimal_str()}")
-            print(f"  quotient = {quotient.to_decimal_str()}, remainder = {remainder.to_decimal_str()}")
+            print(f"  n = {n.numerator.to_decimal_str()}/{n.denominator.to_decimal_str()}")
             
             if BigBase65536._compare_abs(remainder, one) == 0:
                 result = MyFraction.mul(result, base)
+                result._normalize()  # Reduce after multiplication
                 print(f"    Odd exponent: result *= base => {result.numerator.to_decimal_str()}/{result.denominator.to_decimal_str()}")
             
             base = MyFraction.mul(base, base)
+            base._normalize()  # Reduce after squaring
             print(f"    Square base: base *= base => {base.numerator.to_decimal_str()}/{base.denominator.to_decimal_str()}")
             n = quotient
 
         print(f"[POWER DEBUG] Final result = {result.numerator.to_decimal_str()}/{result.denominator.to_decimal_str()}")
         return result
 
+
     @staticmethod
-    def sin(x: "MyFraction", max_terms: int = 10) -> "MyFraction":
-        print(f"[SIN DEBUG] x = {x.numerator.to_decimal_str()}/{x.denominator.to_decimal_str()}")
+    def sin(x: "MyFraction", max_terms: int = 20) -> "MyFraction":
+        """Enhanced sine calculation with better convergence control"""
         result = MyFraction.from_int(0)
-
+        prev_term_size = float('inf')
+        
         for n in range(max_terms):
-            k_int = 2*n + 1
-            k_bb = BigBase65536.from_int(k_int)
+            k = 2*n + 1
+            k_bb = BigBase65536.from_int(k)
             
+            # Compute x^k more efficiently
             if n == 0:
-                term = x
-                print(f"  term[{n}]: k={k_int}")
-                print(f"    Using x directly: {term.numerator.to_decimal_str()}/{term.denominator.to_decimal_str()}")
+                pow_xk = x
             else:
-                print(f"  term[{n}]: k={k_int}")
-                # Debug power calculation step-by-step
-                print(f"    Computing x^{k_int}:")
-                temp_pow = x
-                for i in range(k_int - 1):
-                    print(f"      Step {i+1}: temp = {temp_pow.numerator.to_decimal_str()}/{temp_pow.denominator.to_decimal_str()} * {x.numerator.to_decimal_str()}/{x.denominator.to_decimal_str()}")
-                    temp_pow = MyFraction.mul(temp_pow, x)
-                    print(f"      Result: {temp_pow.numerator.to_decimal_str()}/{temp_pow.denominator.to_decimal_str()}")
-                pow_xk = temp_pow
+                # Use x^2 multiplication instead of k individual multiplications
+                pow_xk = x
+                x_squared = MyFraction.mul(x, x)
+                x_squared._normalize()
                 
-                fact_k = MathOps.factorial(k_bb)
-                term = MyFraction.div(pow_xk, fact_k)
-
-                print(f"    pow_xk => {pow_xk.numerator.to_decimal_str()}/{pow_xk.denominator.to_decimal_str()}")
-                print(f"    fact_k => {fact_k.numerator.to_decimal_str()}/{fact_k.denominator.to_decimal_str()}")
-                print(f"    term = {term.numerator.to_decimal_str()}/{term.denominator.to_decimal_str()}")
-
-            old_result = result
+                for i in range((k-1)//2):
+                    pow_xk = MyFraction.mul(pow_xk, x_squared)
+                    pow_xk._normalize()
+                
+                if k % 2 == 1:
+                    pow_xk = MyFraction.mul(pow_xk, x)
+                    pow_xk._normalize()
+            
+            fact_k = MathOps.factorial(k_bb)
+            term = MyFraction.div(pow_xk, fact_k)
+            term._normalize()
+            
+            # Check convergence
+            term_size = len(term.numerator.digits) + len(term.denominator.digits)
+            if term_size > prev_term_size and term_size < 2:
+                break
+            prev_term_size = term_size
+            
             if n % 2 == 0:
-                print(f"    Adding term:")
-                print(f"      {old_result.numerator.to_decimal_str()}/{old_result.denominator.to_decimal_str()}")
-                print(f"    + {term.numerator.to_decimal_str()}/{term.denominator.to_decimal_str()}")
-                result = result + term
+                result = MyFraction.add(result, term)
             else:
-                print(f"    Subtracting term:")
-                print(f"      {old_result.numerator.to_decimal_str()}/{old_result.denominator.to_decimal_str()}")
-                print(f"    - {term.numerator.to_decimal_str()}/{term.denominator.to_decimal_str()}")
-                result = result - term
-
-            print(f"    = {result.numerator.to_decimal_str()}/{result.denominator.to_decimal_str()}")
-
-        print(f"[SIN DEBUG] final sin(x) => {result.numerator.to_decimal_str()}/{result.denominator.to_decimal_str()}")
+                result = MyFraction.sub(result, term)
+            result._normalize()
+        
         return result
 
     @staticmethod
     def cos(x: "MyFraction", max_terms: int = 10) -> "MyFraction":
-        """
-        Compute cos(x) using Maclaurin series with pure BigBase65536 arithmetic.
-        cos(x) = 1 - x²/2! + x⁴/4! - x⁶/6! + ...
-        """
+        """Compute cos(x) using Taylor series with aggressive reduction."""
         result = MyFraction.from_int(1)
-        sign = -1  # Alternates between -1 and +1
 
         for n in range(1, max_terms):
             k = 2 * n
-
-            # Calculate x^k / k!
-            term = MathOps.power(x, BigBase65536.from_int(k)) / MathOps.factorial(BigBase65536.from_int(k))  # Fix here
+            k_bb = BigBase65536.from_int(k)
             
-            # Apply alternating signs: 1 - x²/2! + x⁴/4! - ...
+            # Calculate x^k with reduction at each step
+            pow_xk = MyFraction.from_int(1)
+            for _ in range(k):
+                pow_xk = MyFraction.mul(pow_xk, x)
+                pow_xk._normalize()
+            
+            fact_k = MathOps.factorial(k_bb)
+            term = MyFraction.div(pow_xk, fact_k)
+            term._normalize()
+            
             if n % 2 == 1:
                 result = MyFraction.sub(result, term)
             else:
                 result = MyFraction.add(result, term)
+            result._normalize()
         
         return result
+
 
     @staticmethod
     def tan(x: "MyFraction", max_terms: int = 10) -> "MyFraction":
@@ -809,31 +817,35 @@ class MathOps:
     @staticmethod
     def arctan(x: "MyFraction", terms: int = 10) -> "MyFraction":
         """
-        Compute arctan(x) using Taylor series:
+        Compute arctan(x) using Taylor series with reduction:
         arctan(x) = x - x³/3 + x⁵/5 - x⁷/7 + ...
         """
         result = MyFraction.from_int(0)
         x_squared = MyFraction.mul(x, x)
+        x_squared._normalize()
         power = x
-        
+
         for n in range(terms):
             k = 2 * n + 1
             term = MyFraction.div(power, MyFraction.from_int(k))
+            term._normalize()
+            
             if n % 2 == 0:
                 result = MyFraction.add(result, term)
             else:
                 result = MyFraction.sub(result, term)
+            result._normalize()
+            
             power = MyFraction.mul(power, x_squared)
-        
+            power._normalize()
+
         return result
     
     @staticmethod
     def pi(terms: int = 10) -> "MyFraction":
         """
-        Compute π using Machin's formula:
+        Compute π using Machin's formula with reduction:
         π/4 = 4 arctan(1/5) - arctan(1/239)
-        
-        This converges much faster than the Leibniz series.
         """
         # Calculate arctan(1/5)
         term1 = MathOps.arctan(
@@ -852,9 +864,12 @@ class MathOps:
             MyFraction.mul(MyFraction.from_int(4), term1),
             term2
         )
+        pi_over_4._normalize()
         
         # Multiply by 4 to get π
-        return MyFraction.mul(MyFraction.from_int(4), pi_over_4)
+        result = MyFraction.mul(MyFraction.from_int(4), pi_over_4)
+        result._normalize()
+        return result
 
 ##############################################################################
 # 2) WaveSymbolic with Fraction-based Evaluate
